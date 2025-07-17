@@ -299,7 +299,7 @@
 
     /* Enhanced quiz styles */
     .quiz-section {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       padding: 2.5rem;
       border-radius: 15px;
@@ -368,7 +368,26 @@
       margin-top: 1rem;
       padding: 1rem;
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .quiz-correct {
+      color: #51cf66 !important;
+      font-weight: 600;
+    }
+
+    .quiz-incorrect {
+      color: #ff8787 !important;
+      font-weight: 600;
+    }
+
+    .quiz-warning {
+      color: #ff6b6b !important;
+      font-weight: 600;
     }
 
     .quiz-score {
@@ -444,6 +463,33 @@
     .dark-mode .toc-item {
       background: #34495e;
       border-color: #4a6741;
+    }
+
+    .dark-mode .quiz-section {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    }
+
+    .dark-mode .quiz-question {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .dark-mode .quiz-result {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #e0e0e0;
+    }
+
+    .dark-mode .quiz-correct {
+      color: #69db7c !important;
+    }
+
+    .dark-mode .quiz-incorrect {
+      color: #ffa8a8 !important;
+    }
+
+    .dark-mode .quiz-warning {
+      color: #ff9999 !important;
     }
 
     /* Responsive design */
@@ -934,7 +980,7 @@
       const resultDiv = document.getElementById(`${questionId}-result`);
       
       if (!selectedOption) {
-        resultDiv.innerHTML = '<p style="color: #e74c3c;">⚠️ Please select an answer first!</p>';
+        resultDiv.innerHTML = '<p class="quiz-warning">⚠️ Please select an answer first!</p>';
         return;
       }
       
@@ -942,9 +988,9 @@
       
       if (selectedOption.value === correctAnswer) {
         quizScore++;
-        resultDiv.innerHTML = `<p style="color: #27ae60;">✅ ${explanation}</p>`;
+        resultDiv.innerHTML = `<p class="quiz-correct">✅ ${explanation}</p>`;
       } else {
-        resultDiv.innerHTML = `<p style="color: #e74c3c;">❌ Not quite right. ${explanation}</p>`;
+        resultDiv.innerHTML = `<p class="quiz-incorrect">❌ Not quite right. ${explanation}</p>`;
       }
       
       // Disable this question
