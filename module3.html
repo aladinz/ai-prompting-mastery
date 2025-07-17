@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Module 3: Building Better Prompts</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Custom styling for Module 3 */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .module-header {
+      background: linear-gradient(135deg, var(--accent, #4a47a3), #6c63ff);
+      color: white;
+      padding: 4rem 1rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .module-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .module-header h1 {
+      font-size: 3rem;
+      margin: 0 0 1rem 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .subtitle {
+      font-size: 1.3rem;
+      margin: 0;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress-wrapper {
+      background: var(--card, #ffffff);
+      border-bottom: 1px solid var(--border, #e0e0e0);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .progress-bar {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .step {
+      padding: 0.7rem 1.2rem;
+      border-radius: 25px;
+      background: var(--light-bg, #f0f0f0);
+      color: var(--text, #666);
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .step.active {
+      background: var(--accent, #4a47a3);
+      color: white;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(74, 71, 163, 0.3);
+    }
+
+    .step.completed {
+      background: var(--success, #22c55e);
+      color: white;
+      border-color: var(--success, #22c55e);
+    }
+
+    .module-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 1rem;
+      line-height: 1.7;
+    }
+
+    .table-of-contents {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0 3rem 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .table-of-contents h3 {
+      margin: 0 0 1.5rem 0;
+      color: var(--accent, #4a47a3);
+      font-size: 1.4rem;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .toc-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .toc-list li {
+      background: var(--light-bg, #f8f9fa);
+      border-radius: 8px;
+      padding: 1rem;
+      transition: all 0.3s ease;
+      border-left: 4px solid var(--accent, #4a47a3);
+    }
+
+    .toc-list li:hover {
+      transform: translateX(5px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .toc-list a {
+      text-decoration: none;
+      color: var(--text, #333);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section {
+      margin: 4rem 0;
+      scroll-margin-top: 100px;
+    }
+
+    .section h2 {
+      color: var(--accent, #4a47a3);
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border, #e0e0e0);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .overview-card {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .overview-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent, #4a47a3), #6c63ff);
+    }
+
+    .overview-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .overview-card .icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .overview-card h3 {
+      color: var(--accent, #4a47a3);
+      margin-bottom: 1rem;
+    }
+
+    .prompt-example {
+      background: var(--light-bg, #f8f9fa);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      position: relative;
+    }
+
+    .prompt-example h4 {
+      margin: 0 0 1rem 0;
+      color: var(--accent, #4a47a3);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .prompt-text {
+      background: var(--card, #ffffff);
+      border-left: 4px solid var(--accent, #4a47a3);
+      padding: 1.5rem;
+      margin: 1rem 0;
+      border-radius: 8px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    .copy-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--accent, #4a47a3);
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.3s ease;
+    }
+
+    .copy-button:hover {
+      background: var(--accent-dark, #373451);
+      transform: scale(1.05);
+    }
+
+    .breakdown-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .breakdown-item {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .breakdown-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .breakdown-item .label {
+      font-weight: 600;
+      color: var(--accent, #4a47a3);
+      margin-bottom: 0.5rem;
+      display: block;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .prompt-builder {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: var(--text, #333);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      padding: 1rem;
+      border: 2px solid var(--border, #e0e0e0);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: var(--light-bg, #f8f9fa);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent, #4a47a3);
+      box-shadow: 0 0 0 3px rgba(74, 71, 163, 0.1);
+    }
+
+    .generated-prompt {
+      background: var(--light-bg, #f8f9fa);
+      border: 2px solid var(--accent, #4a47a3);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 1rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      position: relative;
+      min-height: 100px;
+    }
+
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .example-card {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .example-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+    }
+
+    .example-card.bad::before {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+
+    .example-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .quiz-section {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 3rem 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .quiz-card {
+      background: var(--light-bg, #f8f9fa);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 1.5rem 0;
+      transition: all 0.3s ease;
+    }
+
+    .quiz-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 0.8rem;
+      margin: 1.5rem 0;
+    }
+
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1rem;
+      background: var(--card, #ffffff);
+      border: 2px solid var(--border, #e0e0e0);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--accent, #4a47a3);
+      background: var(--accent-light, #f0f0ff);
+    }
+
+    .quiz-option.selected {
+      border-color: var(--accent, #4a47a3);
+      background: var(--accent-light, #f0f0ff);
+    }
+
+    .quiz-option.correct {
+      border-color: var(--success, #22c55e);
+      background: var(--success-light, #f0fdf4);
+    }
+
+    .quiz-option.incorrect {
+      border-color: var(--error, #ef4444);
+      background: var(--error-light, #fef2f2);
+    }
+
+    .feedback {
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .feedback.correct {
+      background: var(--success-light, #f0fdf4);
+      color: var(--success-dark, #15803d);
+      border-left: 4px solid var(--success, #22c55e);
+    }
+
+    .feedback.incorrect {
+      background: var(--error-light, #fef2f2);
+      color: var(--error-dark, #dc2626);
+      border-left: 4px solid var(--error, #ef4444);
+    }
+
+    .cheat-sheet {
+      background: linear-gradient(135deg, var(--accent, #4a47a3), #6c63ff);
+      color: white;
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      margin: 4rem 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cheat-sheet::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.2;
+    }
+
+    .cheat-sheet-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cheat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+      text-align: left;
+    }
+
+    .cheat-item {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .cheat-item h4 {
+      margin: 0 0 1rem 0;
+      color: #fff;
+      font-size: 1.1rem;
+    }
+
+    .cheat-item p {
+      margin: 0;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .completion-section {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      margin: 4rem 0;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .completion-section.completed {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      border: none;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+    }
+
+    .btn {
+      background: var(--accent, #4a47a3);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(74, 71, 163, 0.3);
+    }
+
+    .btn.secondary {
+      background: var(--card, #ffffff);
+      color: var(--accent, #4a47a3);
+      border: 2px solid var(--accent, #4a47a3);
+    }
+
+    .btn.secondary:hover {
+      background: var(--accent, #4a47a3);
+      color: white;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 4rem 0 2rem 0;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border, #e0e0e0);
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent, #4a47a3);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      transform: translateX(-5px);
+    }
+
+    .nav-link.next:hover {
+      transform: translateX(5px);
+    }
+
+    /* Animation for fade-in effect */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .module-header h1 {
+        font-size: 2.2rem;
+      }
+
+      .subtitle {
+        font-size: 1.1rem;
+      }
+
+      .progress-bar {
+        gap: 0.5rem;
+      }
+
+      .step {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+      }
+
+      .module-content {
+        padding: 2rem 1rem;
+      }
+
+      .section h2 {
+        font-size: 1.6rem;
+      }
+
+      .overview-grid,
+      .examples-grid,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .breakdown-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .navigation {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+
+    /* Dark Mode Support */
+    .dark-mode .module-header {
+      background: linear-gradient(135deg, var(--accent-dark, #2d2a6c), #1e1b4f);
+    }
+
+    .dark-mode .progress-wrapper {
+      background: var(--card-dark, #1a1a1a);
+      border-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .step {
+      background: var(--light-bg-dark, #333);
+      color: var(--text-dark, #ccc);
+    }
+
+    .dark-mode .prompt-text {
+      background: var(--card-dark, #1e1e1e);
+      color: var(--text-dark, #dcdcdc);
+    }
+
+    .dark-mode .generated-prompt {
+      background: var(--light-bg-dark, #1e1e1e);
+      border-color: var(--accent-dark, #6366f1);
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .quiz-option:hover {
+      background: var(--accent-dark-light, #1e1b4f);
+    }
+
+    .dark-mode .cheat-sheet {
+      background: linear-gradient(135deg, var(--accent-dark, #2d2a6c), #1e1b4f);
+    }
+  </style>
+</head>
+<body>
+  <!-- Dark mode detection script -->
+  <script>
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark-mode');
+    }
+  </script>
+
+  <header class="module-header">
+    <div class="container">
+      <h1>🧱 Module 3: Building Better Prompts</h1>
+      <p class="subtitle">Master the anatomy of effective prompts and learn to craft instructions that get exactly what you need from AI.</p>
+    </div>
+  </header>
+
+  <div class="progress-wrapper">
+    <div class="container">
+      <div class="progress-bar">
+        <span class="step completed" title="Completed">📚 Module 1</span>
+        <span class="step completed" title="Completed">🧠 Module 2</span>
+        <span class="step active">🧱 Module 3</span>
+        <span class="step">🔄 Module 4</span>
+        <span class="step">🧭 Module 5</span>
+        <span class="step">🎯 Module 6</span>
+        <span class="step">🔧 Module 7</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="module-content">
+    <!-- Table of Contents -->
+    <div class="table-of-contents fade-in">
+      <h3>📋 What You'll Master in This Module</h3>
+      <ul class="toc-list">
+        <li><a href="#overview">🎯 The Prompt Building Framework</a></li>
+        <li><a href="#anatomy">🔬 Anatomy of Perfect Prompts</a></li>
+        <li><a href="#examples">💡 Before & After Examples</a></li>
+        <li><a href="#builder">🛠️ Interactive Prompt Builder</a></li>
+        <li><a href="#advanced">⚡ Advanced Techniques</a></li>
+        <li><a href="#quiz">🧠 Knowledge Check</a></li>
+      </ul>
+    </div>
+
+    <!-- Overview Section -->
+    <section id="overview" class="section fade-in">
+      <h2>🎯 The Foundation of Great Prompts</h2>
+      <p>Think of prompts like architectural blueprints. A good blueprint tells the builder exactly what to create, how to build it, and what the final result should look like. Similarly, a well-structured prompt gives AI clear, actionable instructions that lead to predictable, high-quality outputs.</p>
+      
+      <div class="overview-grid">
+        <div class="overview-card">
+          <span class="icon">🎭</span>
+          <h3>Role Definition</h3>
+          <p>Tell the AI who it should act as - an expert, a specific professional, or a character with particular knowledge.</p>
+        </div>
+        
+        <div class="overview-card">
+          <span class="icon">🎯</span>
+          <h3>Clear Objectives</h3>
+          <p>Define exactly what you want the AI to accomplish with specific, actionable language.</p>
+        </div>
+        
+        <div class="overview-card">
+          <span class="icon">📐</span>
+          <h3>Format Specification</h3>
+          <p>Describe how you want the output structured - lists, paragraphs, tables, or custom formats.</p>
+        </div>
+        
+        <div class="overview-card">
+          <span class="icon">⚙️</span>
+          <h3>Context & Constraints</h3>
+          <p>Provide relevant background information and any limitations or requirements.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Anatomy Section -->
+    <section id="anatomy" class="section fade-in">
+      <h2>🔬 Anatomy of Perfect Prompts</h2>
+      <p>Every effective prompt follows a structured approach. Let's break down the essential components and see how they work together to create powerful instructions.</p>
+      
+      <div class="prompt-example">
+        <h4>🔍 Example: Let's Deconstruct This Prompt</h4>
+        <div class="prompt-text">
+          <button class="copy-button" onclick="copyToClipboard(this)">📋 Copy</button>
+          "Act as a senior UX designer with 10 years of experience. Create a comprehensive user research plan for a new mobile banking app targeting Gen Z users. Structure your response as a detailed project timeline with 6 phases, including specific research methods, target participant demographics, key questions to investigate, and expected deliverables for each phase. Focus on understanding digital spending habits, security concerns, and preferred interaction patterns. Keep each phase description under 150 words and include estimated timeframes."
+        </div>
+        
+        <div class="breakdown-grid">
+          <div class="breakdown-item">
+            <span class="label">🎭 Role</span>
+            <p>"Act as a senior UX designer with 10 years of experience"</p>
+          </div>
+          <div class="breakdown-item">
+            <span class="label">🎯 Task</span>
+            <p>"Create a comprehensive user research plan for a new mobile banking app"</p>
+          </div>
+          <div class="breakdown-item">
+            <span class="label">👥 Audience</span>
+            <p>"targeting Gen Z users"</p>
+          </div>
+          <div class="breakdown-item">
+            <span class="label">📐 Format</span>
+            <p>"Structure as a detailed project timeline with 6 phases"</p>
+          </div>
+          <div class="breakdown-item">
+            <span class="label">📋 Requirements</span>
+            <p>"Include research methods, demographics, key questions, deliverables"</p>
+          </div>
+          <div class="breakdown-item">
+            <span class="label">🎨 Focus Areas</span>
+            <p>"Digital spending habits, security concerns, interaction patterns"</p>
+          </div>
+          <div class="breakdown-item">
+            <span class="label">⏱️ Constraints</span>
+            <p>"Under 150 words per phase, include timeframes"</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="prompt-example">
+        <h4>⚡ Quick Example: Simple but Structured</h4>
+        <div class="prompt-text">
+          <button class="copy-button" onclick="copyToClipboard(this)">📋 Copy</button>
+          "As a fitness instructor, create a 4-week beginner workout plan. Format it as a weekly schedule with 3 workouts per week. Include exercise names, sets, reps, and rest periods. Focus on building foundational strength without equipment."
+        </div>
+        
+        <div class="breakdown-grid">
+          <div class="breakdown-item">
+            <span class="label">🎭 Role</span>
+            <p>"As a fitness instructor"</p>
+          </div>
+          <div class="breakdown-item">
+            <span class="label">🎯 Task</span>
+            <p>"create a 4-week beginner workout plan"</p>
+          </div>
+          <div class="breakdown-item">
+            <span class="label">📐 Format</span>
+            <p>"weekly schedule with 3 workouts per week"</p>
+          </div>
+          <div class="breakdown-item">
+            <span class="label">📋 Details</span>
+            <p>"exercise names, sets, reps, rest periods"</p>
+          </div>
+          <div class="breakdown-item">
+            <span class="label">🎯 Focus</span>
+            <p>"foundational strength without equipment"</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Before & After Examples -->
+    <section id="examples" class="section fade-in">
+      <h2>💡 Before & After: Transforming Weak Prompts</h2>
+      <p>See how small changes can dramatically improve your results. We'll transform vague, weak prompts into clear, powerful instructions.</p>
+      
+      <div class="examples-grid">
+        <div class="example-card bad">
+          <h4>❌ Weak Prompt</h4>
+          <div class="prompt-text">
+            "Write about marketing."
+          </div>
+          <p><strong>Why it's weak:</strong> Too vague, no specific goal, no format, no context.</p>
+          <p><strong>What you'll get:</strong> Generic, broad content that probably won't meet your needs.</p>
+        </div>
+        
+        <div class="example-card">
+          <h4>✅ Strong Prompt</h4>
+          <div class="prompt-text">
+            "Act as a digital marketing strategist. Write a 5-step social media marketing plan for a local coffee shop wanting to increase weekend foot traffic. Format as numbered steps with specific tactics, target platforms, and success metrics. Focus on Instagram and TikTok strategies for reaching 18-35 year olds. Include budget considerations under $500/month."
+          </div>
+          <p><strong>Why it works:</strong> Clear role, specific goal, defined format, target audience, budget constraints.</p>
+          <p><strong>What you'll get:</strong> Actionable, targeted advice perfect for your situation.</p>
+        </div>
+      </div>
+
+      <div class="examples-grid">
+        <div class="example-card bad">
+          <h4>❌ Weak Prompt</h4>
+          <div class="prompt-text">
+            "Help me with my presentation."
+          </div>
+          <p><strong>Why it's weak:</strong> No topic, audience, or type of help specified.</p>
+          <p><strong>What you'll get:</strong> Generic presentation tips.</p>
+        </div>
+        
+        <div class="example-card">
+          <h4>✅ Strong Prompt</h4>
+          <div class="prompt-text">
+            "Act as a presentation coach. Create an outline for a 10-minute pitch presentation to convince startup investors to fund a mobile app for plant care. Structure it with: hook opening, problem statement, solution overview, market opportunity, business model, and call to action. Include speaking notes for each section and suggest 3 compelling visual elements. Target audience: tech-savvy investors familiar with mobile apps."
+          </div>
+          <p><strong>Why it works:</strong> Specific scenario, clear structure, defined audience, actionable deliverables.</p>
+          <p><strong>What you'll get:</strong> A complete, tailored presentation framework.</p>
+        </div>
+      </div>
+
+      <div class="examples-grid">
+        <div class="example-card bad">
+          <h4>❌ Weak Prompt</h4>
+          <div class="prompt-text">
+            "Make a workout routine."
+          </div>
+          <p><strong>Why it's weak:</strong> No fitness level, goals, equipment, or time constraints.</p>
+          <p><strong>What you'll get:</strong> Generic workout that may not suit your needs.</p>
+        </div>
+        
+        <div class="example-card">
+          <h4>✅ Strong Prompt</h4>
+          <div class="prompt-text">
+            "Act as a certified personal trainer. Design a 6-week strength training program for a beginner who wants to build muscle and lose 15 pounds. Format as a weekly schedule with 3 workouts per week, 45 minutes each. Include: exercise names, sets, reps, rest periods, and progression plan. Equipment available: dumbbells, resistance bands, yoga mat. Person has no injuries but hasn't exercised regularly in 2 years."
+          </div>
+          <p><strong>Why it works:</strong> Specific goals, fitness level, equipment list, time constraints, health considerations.</p>
+          <p><strong>What you'll get:</strong> A safe, progressive, personalized fitness plan.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Prompt Builder -->
+    <section id="builder" class="section fade-in">
+      <h2>🛠️ Interactive Prompt Builder</h2>
+      <p>Practice building structured prompts with our interactive tool. Fill in each section and watch your prompt come together!</p>
+      
+      <div class="prompt-builder">
+        <h3>🧱 Build Your Perfect Prompt</h3>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>🎭 Role/Persona</label>
+            <input type="text" id="role" placeholder="e.g., Act as a senior data scientist..." />
+            <small>Define who the AI should act as</small>
+          </div>
+          
+          <div class="form-group">
+            <label>🎯 Main Task</label>
+            <input type="text" id="task" placeholder="e.g., Create a comprehensive analysis of..." />
+            <small>What exactly do you want the AI to do?</small>
+          </div>
+          
+          <div class="form-group">
+            <label>👥 Target Audience</label>
+            <input type="text" id="audience" placeholder="e.g., for executives with no technical background..." />
+            <small>Who is this for? (optional but helpful)</small>
+          </div>
+          
+          <div class="form-group">
+            <label>📐 Output Format</label>
+            <input type="text" id="format" placeholder="e.g., as a bullet-pointed executive summary..." />
+            <small>How should the result be structured?</small>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>📋 Additional Requirements</label>
+          <textarea id="requirements" rows="3" placeholder="e.g., Include data sources, keep under 500 words, focus on actionable insights..."></textarea>
+          <small>Any specific constraints, focus areas, or special instructions</small>
+        </div>
+        
+        <div class="form-group">
+          <label>🌍 Context & Background</label>
+          <textarea id="context" rows="3" placeholder="e.g., Our company is a mid-size retail business looking to expand online..."></textarea>
+          <small>Relevant background information that will help the AI understand your situation</small>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn" onclick="buildPrompt()">🚀 Generate My Prompt</button>
+          <button class="btn secondary" onclick="clearBuilder()">🗑️ Clear All</button>
+        </div>
+        
+        <div id="generated-output" class="generated-prompt" style="display: none;">
+          <button class="copy-button" onclick="copyToClipboard(this)">📋 Copy</button>
+          <div id="prompt-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Advanced Techniques -->
+    <section id="advanced" class="section fade-in">
+      <h2>⚡ Advanced Prompt Engineering Techniques</h2>
+      <p>Take your prompting skills to the next level with these professional techniques used by experts.</p>
+      
+      <div class="overview-grid">
+        <div class="overview-card">
+          <span class="icon">🔗</span>
+          <h3>Chain of Thought</h3>
+          <p>Ask AI to "think step by step" or "explain your reasoning" to get more thoughtful, accurate responses.</p>
+          <div class="prompt-text">
+            "Think step by step: How would you solve this customer retention problem?"
+          </div>
+        </div>
+        
+        <div class="overview-card">
+          <span class="icon">🎯</span>
+          <h3>Few-Shot Examples</h3>
+          <p>Provide 2-3 examples of the output you want to train the AI on your desired style and format.</p>
+          <div class="prompt-text">
+            "Write headlines like these examples:
+            Example 1: '5 Mistakes That Kill Your Landing Page Conversions'
+            Example 2: 'Why 73% of SaaS Companies Fail at Onboarding'
+            Now write 3 similar headlines for email marketing."
+          </div>
+        </div>
+        
+        <div class="overview-card">
+          <span class="icon">🎭</span>
+          <h3>Persona Injection</h3>
+          <p>Give the AI specific personality traits or perspectives to influence the tone and approach of responses.</p>
+          <div class="prompt-text">
+            "Write as if you're an enthusiastic teacher explaining to curious 8th graders..."
+          </div>
+        </div>
+        
+        <div class="overview-card">
+          <span class="icon">⚖️</span>
+          <h3>Constraint Setting</h3>
+          <p>Use specific limitations to force creativity and ensure outputs meet your exact needs.</p>
+          <div class="prompt-text">
+            "Explain quantum computing in exactly 3 paragraphs, using no technical jargon, with each paragraph having exactly 4 sentences."
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Knowledge Check Quiz -->
+    <section id="quiz" class="section fade-in">
+      <div class="quiz-section">
+        <h2>🧠 Test Your Prompt Building Skills</h2>
+        <p>Let's see how well you've mastered the art of building effective prompts!</p>
+        
+        <div id="quiz-container"></div>
+        
+        <div class="action-buttons">
+          <button class="btn" onclick="resetQuiz()">🔄 Retake Quiz</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cheat Sheet -->
+    <section class="cheat-sheet fade-in">
+      <div class="cheat-sheet-content">
+        <h2>📚 Prompt Building Cheat Sheet</h2>
+        <p>Save this handy reference for building powerful prompts every time!</p>
+        
+        <div class="cheat-grid">
+          <div class="cheat-item">
+            <h4>🎭 Role Setting</h4>
+            <p>"Act as a [specific expert/professional]"<br>
+            "You are a [role] with [years] years of experience"</p>
+          </div>
+          
+          <div class="cheat-item">
+            <h4>🎯 Task Definition</h4>
+            <p>"Create/Write/Analyze/Design a [specific output]"<br>
+            "Your goal is to [specific objective]"</p>
+          </div>
+          
+          <div class="cheat-item">
+            <h4>📐 Format Structure</h4>
+            <p>"Format as [bullets/numbered list/table/essay]"<br>
+            "Structure your response with [specific sections]"</p>
+          </div>
+          
+          <div class="cheat-item">
+            <h4>⚙️ Constraints & Context</h4>
+            <p>"Keep each section under [X] words"<br>
+            "Focus on [specific aspects]"<br>
+            "Include [specific elements]"</p>
+          </div>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn secondary" onclick="copyCheatSheet()">📋 Copy Cheat Sheet</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Completion Section -->
+    <section class="completion-section" id="completion">
+      <h2>🎉 Congratulations!</h2>
+      <p>You've mastered the fundamentals of building better prompts. You now know how to structure clear, effective instructions that get great results from AI.</p>
+      
+      <div class="action-buttons">
+        <div id="completion-actions">
+          <button class="btn" id="complete-btn" onclick="markComplete()">✅ Mark Module 3 Complete</button>
+          <button class="btn" id="restart-btn" onclick="restartModule()" style="display: none;">🔄 Study This Module Again</button>
+        </div>
+      </div>
+      
+      <div id="completion-status"></div>
+    </section>
+
+    <!-- Navigation -->
+    <div class="navigation">
+      <a href="module2.html" class="nav-link">← Previous: Types of Prompts</a>
+      <a href="module4.html" class="nav-link next">Next: Refining Outputs →</a>
+    </div>
+
+    <!-- Home Link -->
+    <div style="text-align: center; margin: 2rem 0;">
+      <a href="index.html" class="btn secondary">🏠 Back to Home</a>
+    </div>
+  </main>
+
+  <script>
+    // Quiz data for Module 3
+    const quizData = [
+      {
+        question: "Which component of a prompt tells the AI what expertise to apply?",
+        options: [
+          "Task definition",
+          "Role/Persona setting", 
+          "Format specification",
+          "Context information"
+        ],
+        answer: 1,
+        explanation: "The role or persona setting tells the AI what expertise or perspective to use when responding to your prompt."
+      },
+      {
+        question: "What makes this prompt weak: 'Write something about exercise'?",
+        options: [
+          "It's too short",
+          "It lacks specific goals, audience, and format",
+          "It doesn't use technical terms",
+          "It's not polite enough"
+        ],
+        answer: 1,
+        explanation: "The prompt is weak because it doesn't specify what type of content, for whom, in what format, or what the goal is."
+      },
+      {
+        question: "What's the purpose of adding constraints to your prompts?",
+        options: [
+          "To make prompts longer",
+          "To confuse the AI",
+          "To force creativity and ensure specific requirements are met",
+          "To make prompts sound more professional"
+        ],
+        answer: 2,
+        explanation: "Constraints help focus the AI's output and ensure it meets your specific needs, often leading to more creative solutions."
+      },
+      {
+        question: "In the 'Chain of Thought' technique, what do you ask the AI to do?",
+        options: [
+          "Work faster",
+          "Think step by step or explain reasoning",
+          "Use more technical language",
+          "Provide shorter answers"
+        ],
+        answer: 1,
+        explanation: "Chain of Thought prompting asks the AI to show its reasoning process, leading to more thoughtful and accurate responses."
+      },
+      {
+        question: "What's the benefit of providing examples in your prompts?",
+        options: [
+          "It makes prompts longer",
+          "It trains the AI on your desired style and format",
+          "It's more polite",
+          "It uses less tokens"
+        ],
+        answer: 1,
+        explanation: "Examples (few-shot prompting) help the AI understand exactly what style, format, and quality you're looking for."
+      }
+    ];
+
+    // Initialize quiz
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+      
+      quizData.forEach((q, index) => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+        card.innerHTML = `
+          <h4>Question ${index + 1}</h4>
+          <p><strong>${q.question}</strong></p>
+          <div class="quiz-options">
+            ${q.options.map((opt, i) => `
+              <label class="quiz-option" onclick="selectOption(${index}, ${i})">
+                <input type="radio" name="q${index}" value="${i}" style="display: none;" />
+                <span>${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+          <button class="btn" onclick="checkAnswer(${index}, ${q.answer})" style="margin-top: 1rem;">Check Answer</button>
+          <div id="feedback${index}" class="feedback" style="display: none;"></div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function selectOption(questionIndex, optionIndex) {
+      const question = document.querySelectorAll('.quiz-card')[questionIndex];
+      const options = question.querySelectorAll('.quiz-option');
+      
+      options.forEach(opt => opt.classList.remove('selected'));
+      options[optionIndex].classList.add('selected');
+      
+      const radio = question.querySelector(`input[value="${optionIndex}"]`);
+      radio.checked = true;
+    }
+
+    function checkAnswer(questionIndex, correctAnswer) {
+      const question = document.querySelectorAll('.quiz-card')[questionIndex];
+      const selected = question.querySelector('input[name="q' + questionIndex + '"]:checked');
+      const feedback = document.getElementById(`feedback${questionIndex}`);
+      const options = question.querySelectorAll('.quiz-option');
+      
+      if (!selected) {
+        feedback.textContent = "⚠️ Please select an answer first.";
+        feedback.className = "feedback incorrect";
+        feedback.style.display = "block";
+        return;
+      }
+      
+      const selectedValue = parseInt(selected.value);
+      
+      // Reset all options
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+      
+      if (selectedValue === correctAnswer) {
+        options[selectedValue].classList.add('correct');
+        feedback.textContent = "✅ Correct! " + quizData[questionIndex].explanation;
+        feedback.className = "feedback correct";
+      } else {
+        options[selectedValue].classList.add('incorrect');
+        options[correctAnswer].classList.add('correct');
+        feedback.textContent = "❌ Not quite right. " + quizData[questionIndex].explanation;
+        feedback.className = "feedback incorrect";
+      }
+      
+      feedback.style.display = "block";
+    }
+
+    function resetQuiz() {
+      renderQuiz();
+    }
+
+    // Prompt builder functionality
+    function buildPrompt() {
+      const role = document.getElementById('role').value.trim();
+      const task = document.getElementById('task').value.trim();
+      const audience = document.getElementById('audience').value.trim();
+      const format = document.getElementById('format').value.trim();
+      const requirements = document.getElementById('requirements').value.trim();
+      const context = document.getElementById('context').value.trim();
+      
+      if (!role && !task) {
+        alert('Please fill in at least the Role and Task fields to build a prompt.');
+        return;
+      }
+      
+      let prompt = '';
+      
+      if (role) {
+        prompt += role + '. ';
+      }
+      
+      if (task) {
+        prompt += task;
+        if (audience) {
+          prompt += ' ' + audience;
+        }
+        prompt += '. ';
+      }
+      
+      if (format) {
+        prompt += 'Format your response ' + format + '. ';
+      }
+      
+      if (requirements) {
+        prompt += requirements + '. ';
+      }
+      
+      if (context) {
+        prompt += 'Context: ' + context;
+      }
+      
+      document.getElementById('prompt-result').textContent = prompt;
+      document.getElementById('generated-output').style.display = 'block';
+      
+      // Scroll to result
+      document.getElementById('generated-output').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
+
+    function clearBuilder() {
+      document.getElementById('role').value = '';
+      document.getElementById('task').value = '';
+      document.getElementById('audience').value = '';
+      document.getElementById('format').value = '';
+      document.getElementById('requirements').value = '';
+      document.getElementById('context').value = '';
+      document.getElementById('generated-output').style.display = 'none';
+    }
+
+    // Copy functionality
+    function copyToClipboard(button) {
+      const parent = button.parentElement;
+      const textToCopy = parent.textContent.replace('📋 Copy', '').trim();
+      
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalText = button.textContent;
+        button.textContent = '✅ Copied!';
+        button.style.background = '#22c55e';
+        
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.background = '';
+        }, 2000);
+      }).catch(() => {
+        alert('Copy failed. Please try selecting and copying manually.');
+      });
+    }
+
+    function copyCheatSheet() {
+      const cheatSheet = `
+PROMPT BUILDING CHEAT SHEET
+
+🎭 Role Setting:
+- "Act as a [specific expert/professional]"
+- "You are a [role] with [years] years of experience"
+
+🎯 Task Definition:
+- "Create/Write/Analyze/Design a [specific output]"
+- "Your goal is to [specific objective]"
+
+📐 Format Structure:
+- "Format as [bullets/numbered list/table/essay]"
+- "Structure your response with [specific sections]"
+
+⚙️ Constraints & Context:
+- "Keep each section under [X] words"
+- "Focus on [specific aspects]"
+- "Include [specific elements]"
+
+💡 Advanced Techniques:
+- Chain of Thought: "Think step by step"
+- Few-Shot: Provide 2-3 examples
+- Persona Injection: Give specific personality traits
+- Constraint Setting: Use specific limitations
+      `;
+      
+      navigator.clipboard.writeText(cheatSheet).then(() => {
+        alert('📋 Cheat sheet copied to clipboard!');
+      }).catch(() => {
+        alert('Copy failed. Please try selecting and copying manually.');
+      });
+    }
+
+    // Completion functionality
+    function markComplete() {
+      localStorage.setItem('module3Complete', 'true');
+      localStorage.setItem('module3CompletedAt', new Date().toISOString());
+      const section = document.getElementById('completion');
+      const status = document.getElementById('completion-status');
+      
+      section.classList.add('completed');
+      status.innerHTML = `
+        <h3>🎉 Module 3 Complete!</h3>
+        <p>Excellent work! You've mastered prompt building fundamentals. You can study this module again anytime!</p>
+        <a href="module4.html" class="btn">🚀 Continue to Module 4</a>
+      `;
+      
+      // Update completion UI
+      updateCompletionUI();
+      
+      // Update progress in home page
+      window.dispatchEvent(new Event('moduleCompleted'));
+    }
+
+    // UPDATE COMPLETION UI
+    function updateCompletionUI() {
+      const completeBtn = document.getElementById('complete-btn');
+      const restartBtn = document.getElementById('restart-btn');
+      
+      if (localStorage.getItem('module3Complete') === 'true') {
+        completeBtn.style.display = 'none';
+        restartBtn.style.display = 'inline-block';
+      } else {
+        completeBtn.style.display = 'inline-block';
+        restartBtn.style.display = 'none';
+      }
+    }
+
+    // RESTART MODULE FUNCTIONALITY
+    function restartModule() {
+      if (confirm('🔄 Are you sure you want to restart this module? This will reset your progress but keep your completion history.')) {
+        // Reset completion section
+        const section = document.getElementById('completion');
+        const status = document.getElementById('completion-status');
+        section.classList.remove('completed');
+        status.innerHTML = '';
+        
+        // Reset all quiz attempts
+        document.querySelectorAll('.quiz-question').forEach(question => {
+          question.classList.remove('answered');
+          const buttons = question.querySelectorAll('button');
+          buttons.forEach(btn => {
+            btn.classList.remove('correct', 'incorrect');
+            btn.disabled = false;
+          });
+        });
+        
+        // Reset form fields
+        document.querySelectorAll('input[type="text"], textarea').forEach(input => {
+          input.value = '';
+        });
+        
+        // Show restart notification
+        status.innerHTML = '<p>🔄 Module restarted! You can now study through the content again.</p>';
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Fade-in animation on scroll
+    function addScrollAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, {
+        threshold: 0.1
+      });
+
+      document.querySelectorAll('.fade-in').forEach(section => {
+        observer.observe(section);
+      });
+    }
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      renderQuiz();
+      addScrollAnimations();
+      
+      // Check if module is already completed
+      if (localStorage.getItem('module3Complete') === 'true') {
+        const section = document.getElementById('completion');
+        const status = document.getElementById('completion-status');
+        const completedAt = localStorage.getItem('module3CompletedAt');
+        const completedDate = completedAt ? new Date(completedAt).toLocaleDateString() : 'previously';
+        section.classList.add('completed');
+        status.innerHTML = `
+          <h3>✅ Module 3 Already Complete!</h3>
+          <p>Great job! You completed this module ${completedDate}. You can study it again anytime!</p>
+          <a href="module4.html" class="btn">🚀 Continue to Module 4</a>
+        `;
+      }
+      
+      // Update completion UI
+      updateCompletionUI();
+    });
+  </script>
+</body>
+</html>

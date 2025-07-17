@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Module 1: What Is Prompt Engineering?</title>
+  <link rel="stylesheet" href="module1.css" />
+  <style>
+    /* Module Progress Indicator */
+    .module-progress {
+      position: sticky;
+      top: 0;
+      background: var(--card, #ffffff);
+      padding: 1rem;
+      border-bottom: 2px solid var(--border, #e0e0e0);
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .progress-steps {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .progress-step {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      background: var(--light-bg, #f8f9fa);
+      border: 2px solid transparent;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text, #666);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .progress-step.active {
+      background: var(--accent, #4a47a3);
+      color: white;
+      border-color: var(--accent, #4a47a3);
+    }
+
+    .progress-step.completed {
+      background: var(--success, #28a745);
+      color: white;
+      border-color: var(--success, #28a745);
+    }
+
+    .progress-step:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Table of Contents */
+    .table-of-contents {
+      background: linear-gradient(135deg, var(--accent, #4a47a3), #6c63ff);
+      color: white;
+      padding: 2rem;
+      margin: 2rem 0;
+      border-radius: 16px;
+      text-align: center;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      max-width: 600px;
+      margin: 1.5rem auto 0;
+    }
+
+    .toc-item {
+      background: rgba(255,255,255,0.1);
+      padding: 1rem;
+      border-radius: 12px;
+      text-decoration: none;
+      color: white;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .toc-item:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    /* Copy to Clipboard functionality */
+    .copyable-prompt {
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .copyable-prompt:hover {
+      background: var(--light-bg, #f8f9fa);
+      border-radius: 8px;
+      padding: 0.5rem;
+      margin: -0.5rem;
+    }
+
+    .copy-indicator {
+      position: absolute;
+      top: -30px;
+      right: 0;
+      background: var(--success, #28a745);
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .copy-indicator.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Enhanced animations */
+    .section-fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease;
+    }
+
+    .section-fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Enhanced tooltip system */
+    .tooltip {
+      position: relative;
+      border-bottom: 2px dotted var(--accent, #4a47a3);
+      cursor: help;
+    }
+
+    .tooltip:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--dark-bg, #2c3e50);
+      color: white;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .tooltip:hover::before {
+      content: '';
+      position: absolute;
+      bottom: 115%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--dark-bg, #2c3e50);
+      z-index: 1001;
+    }
+
+    .cheat-sheet {
+      text-align: center;
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: var(--card, #f8f9fa);
+      border-radius: 8px;
+      border: 2px dashed var(--accent, #4a47a3);
+    }
+    
+    .print-button, .download-button {
+      margin: 0.5rem;
+      min-width: 180px;
+    }
+    
+    .download-button {
+      background: var(--success, #28a745);
+      border-color: var(--success, #28a745);
+    }
+    
+    .download-button:hover {
+      background: #218838;
+      border-color: #1e7e34;
+    }
+
+    /* Enhanced table styling for dark mode compatibility */
+    .prompt-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      background: var(--card, #ffffff);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .prompt-table th,
+    .prompt-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--border, #e0e0e0);
+    }
+
+    .prompt-table th {
+      background: var(--accent, #4a47a3);
+      color: white;
+      font-weight: 600;
+    }
+
+    .prompt-table tr:nth-child(even) {
+      background: var(--light-bg, #f8f9fa);
+    }
+
+    .prompt-table tr:hover {
+      background: var(--hover-bg, #e8f4f8);
+    }
+
+    /* Dark mode specific styles */
+    .dark-mode .prompt-table,
+    html.dark-mode .prompt-table {
+      background: #2d3748;
+      color: #e2e8f0;
+    }
+
+    .dark-mode .prompt-table th,
+    html.dark-mode .prompt-table th {
+      background: #5a67d8;
+    }
+
+    .dark-mode .prompt-table td,
+    html.dark-mode .prompt-table td {
+      border-bottom-color: #4a5568;
+    }
+
+    .dark-mode .prompt-table tr:nth-child(even),
+    html.dark-mode .prompt-table tr:nth-child(even) {
+      background: #374151;
+    }
+
+    .dark-mode .prompt-table tr:hover,
+    html.dark-mode .prompt-table tr:hover {
+      background: #4a5568;
+    }
+
+    /* Additional dark mode support for other elements */
+    .dark-mode .cheat-sheet,
+    html.dark-mode .cheat-sheet {
+      background: #374151;
+      border-color: #5a67d8;
+      color: #e2e8f0;
+    }
+
+    .dark-mode .example-box,
+    html.dark-mode .example-box {
+      background: #374151;
+      border-color: #4a5568;
+    }
+
+    .dark-mode .comparison,
+    html.dark-mode .comparison {
+      background: #2d3748;
+    }
+
+    .dark-mode .weak-prompt,
+    html.dark-mode .weak-prompt {
+      background: #4a1717;
+      border-left-color: #e53e3e;
+    }
+
+    .dark-mode .strong-prompt,
+    html.dark-mode .strong-prompt {
+      background: #1a4a3a;
+      border-left-color: #38a169;
+    }
+
+    .dark-mode .prompt-box,
+    html.dark-mode .prompt-box {
+      background: #2d3748;
+      border-color: #5a67d8;
+      color: #e2e8f0;
+    }
+
+    .dark-mode .comparison-grid .comparison-card,
+    html.dark-mode .comparison-grid .comparison-card {
+      background: #374151;
+      border-color: #4a5568;
+    }
+
+    .dark-mode .comparison-card.weak-example,
+    html.dark-mode .comparison-card.weak-example {
+      background: #4a1717;
+      border-color: #e53e3e;
+    }
+
+    .dark-mode .comparison-card.good-example,
+    html.dark-mode .comparison-card.good-example {
+      background: #1a4a3a;
+      border-color: #38a169;
+    }
+
+    /* Dark mode for new interactive elements */
+    .dark-mode .module-progress,
+    html.dark-mode .module-progress {
+      background: var(--card-dark, #2d3748);
+      border-color: var(--border-dark, #4a5568);
+    }
+
+    .dark-mode .progress-step,
+    html.dark-mode .progress-step {
+      background: var(--light-bg-dark, #374151);
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .table-of-contents,
+    html.dark-mode .table-of-contents {
+      background: linear-gradient(135deg, var(--accent-dark, #6366f1), #8b5cf6);
+    }
+
+    .dark-mode .copyable-prompt:hover,
+    html.dark-mode .copyable-prompt:hover {
+      background: var(--light-bg-dark, #374151);
+    }
+
+    .dark-mode .tooltip:hover::after,
+    html.dark-mode .tooltip:hover::after {
+      background: var(--light-bg-dark, #374151);
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .tooltip:hover::before,
+    html.dark-mode .tooltip:hover::before {
+      border-top-color: var(--light-bg-dark, #374151);
+    }
+
+    @media print {
+      .cheat-sheet, .module-footer, .progress-bar, .complete, .module-progress, .table-of-contents {
+        display: none !important;
+      }
+      
+      .prompt-table {
+        page-break-inside: avoid;
+        margin: 1rem 0;
+      }
+      
+      .prompt-table th,
+      .prompt-table td {
+        padding: 8px;
+        font-size: 12px;
+      }
+    }
+  </style>
+  <script>
+    // Apply dark mode immediately to prevent flash
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.documentElement.classList.add('dark-mode');
+      // Apply to body when it's available
+      document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('dark-mode');
+      });
+    }
+  </script>
+</head>
+<body>
+  
+ <div class="progress-bar">
+  <span class="step active">Module 1</span>
+  <span class="step">Module 2</span>
+  <span class="step">Module 3</span>
+  <span class="step">Module 4</span>
+  <span class="step">Module 5</span>
+</div>
+  
+    <header class="module-header">
+    <h1>🧠 Module 1: What Is Prompt Engineering?</h1>
+    <p class="subtitle">Learn how to guide AI with clarity, creativity, and precision.</p>
+  </header>
+
+  <!-- Module Progress Indicator -->
+  <div class="module-progress">
+    <div class="progress-steps">
+      <div class="progress-step completed" onclick="scrollToSection('key-insights')">🔑 Key Insights</div>
+      <div class="progress-step active" onclick="scrollToSection('definition')">🎯 Definition</div>
+      <div class="progress-step" onclick="scrollToSection('framework')">🛠️ Framework</div>
+      <div class="progress-step" onclick="scrollToSection('examples')">📝 Examples</div>
+    </div>
+  </div>
+
+  <!-- Table of Contents -->
+  <section class="table-of-contents section-fade-in">
+    <h2>📚 Navigate This Module</h2>
+    <p>Master the fundamentals of prompt engineering step by step</p>
+    <div class="toc-grid">
+      <a href="#key-insights" class="toc-item">🔑 Key Insights</a>
+      <a href="#definition" class="toc-item">🎯 Definition</a>
+      <a href="#framework" class="toc-item">🛠️ Framework</a>
+      <a href="#examples" class="toc-item">📝 Examples</a>
+    </div>
+  </section>
+
+  <main class="module-content">
+
+<section class="key-insights section-fade-in" id="key-insights">
+  <h2>🔑 Key Insight</h2>
+  <blockquote>
+    "Prompt engineering is the art of communicating with AI to get exactly the results you want. Think of it as writing clear instructions for a highly capable assistant."
+  </blockquote>
+ <p>
+    The most important insight for anyone new to prompt engineering is <strong>clarity and specificity drive results</strong>. A <span class="tooltip" data-tooltip="Clear prompts eliminate ambiguity and help AI understand your exact intent">prompt that is clear, focused, and provides context</span> enables the AI to interpret your intent more accurately and produce better, more relevant answers. Vague or ambiguous prompts often lead to generic or off-target responses. Effective prompt engineering often involves <span class="tooltip" data-tooltip="Try different approaches, refine language, and improve based on results"><strong>iterative refinement</strong></span>—experimenting with different phrasings and details—until the AI's output meets your needs.
+  </p>
+
+</section>
+
+<section class="why-it-matters section-fade-in" id="why-it-matters">
+  <h2>🌟 Why Prompt Engineering Matters</h2>
+  
+  <ul class="benefits-list">
+    <li>
+      <strong>Improves output quality:</strong> Precise prompts get you relevant, accurate, and usable results.
+    </li>
+    <li>
+      <strong>Saves time:</strong> Clear instructions reduce the need for manual editing and multiple interactions.
+    </li>
+    <li>
+      <strong>Unlocks AI potential:</strong> Well-crafted prompts let you harness the full power of AI tools for creative, analytical, and functional tasks.
+    </li>
+  </ul>
+  
+  <div class="example-box">
+    <h3>💡 Example</h3>
+    <div class="comparison">
+      <div class="weak-prompt">
+        <strong>Less effective prompt:</strong><br />
+        <span class="copyable-prompt" onclick="copyToClipboard(this)">"Explain AI."</span>
+        <div class="copy-indicator">Copied! ✅</div>
+      </div>
+      <div class="strong-prompt">
+        <strong>Well-engineered prompt:</strong><br />
+        <span class="copyable-prompt" onclick="copyToClipboard(this)">"Explain the concept of artificial intelligence in simple terms, suitable for a beginner, and include two real-world examples."</span>
+        <div class="copy-indicator">Copied! ✅</div>
+      </div>
+    </div>
+  </div>
+  
+  <p class="conclusion">
+    Mastering prompt engineering is both an art and a science, empowering users of all skill levels to interact more effectively with AI systems and achieve far better outcomes.
+  </p>
+</section>
+
+<section class="definition section-fade-in" id="definition">
+  <h2>🎯 What Is Prompt Engineering?</h2>
+  <p>
+    <strong>Prompt engineering</strong> is the practice of crafting effective instructions (prompts) to guide AI models toward desired outputs. It's part science, part art—requiring <span class="tooltip" data-tooltip="Clear, unambiguous language that AI can interpret correctly">clarity</span>, <span class="tooltip" data-tooltip="Innovative approaches to get unique and useful responses">creativity</span>, and understanding of how AI systems interpret language.
+  </p>
+  
+  <p>
+    A well-crafted prompt bridges the gap between what you want from the AI and the responses it can generate, making it essential for anyone interacting with generative models—whether for text, images, code, or more.
+  </p>
+  
+  <div class="example-box">
+    <h3>💡 Real-World Example</h3>
+    <div class="comparison">
+      <div class="weak-prompt">
+        <strong>Weak prompt:</strong><br />
+        <span class="copyable-prompt" onclick="copyToClipboard(this)">"Help me with coding."</span>
+        <div class="copy-indicator">Copied! ✅</div>
+      </div>
+      <div class="strong-prompt">
+        <strong>Strong prompt:</strong><br />
+        <span class="copyable-prompt" onclick="copyToClipboard(this)">"Act as a Python expert. Help me write a function that calculates compound interest. Include comments, handle edge cases, and provide usage examples."</span>
+        <div class="copy-indicator">Copied! ✅</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="framework section-fade-in" id="framework">
+  <h2>🛠️ The 7-Element Prompt Framework</h2>
+  <p>Every effective prompt should include these core elements:</p>
+
+  <ol class="framework-list">
+    <li>
+      <strong>1. Role/Context</strong><br />
+      Define who the AI should act as (e.g., "Act as a financial advisor").<br />
+      <em>Why it matters:</em> Sets the perspective and expertise level.
+    </li>
+    <li>
+      <strong>2. Task/Objective</strong><br />
+      Clearly state what you want the AI to do.<br />
+      <em>Why it matters:</em> Prevents vague or off-topic responses.
+    </li>
+    <li>
+      <strong>3. Requirements/Constraints</strong><br />
+      Specify any limitations (e.g., word count, style, difficulty level).<br />
+      <em>Why it matters:</em> Ensures output meets your specific needs.
+    </li>
+    <li>
+      <strong>4. Input Data/Context</strong><br />
+      Provide relevant information or examples.<br />
+      <em>Why it matters:</em> Gives the AI concrete material to work with.
+    </li>
+    <li>
+      <strong>5. Output Format</strong><br />
+      Specify how you want the response (e.g., "Bullet points," "Table," "Step-by-step guide").<br />
+      <em>Why it matters:</em> Format instructions make the output easier to use.
+    </li>
+    <li>
+      <strong>6. Clarity and Conciseness</strong><br />
+      Use simple, direct language. Avoid jargon unless necessary.<br />
+      <em>Why it matters:</em> Clear prompts reduce confusion and improve relevance.
+    </li>
+    <li>
+      <strong>7. Iteration and Refinement</strong><br />
+      Refine your prompt based on the AI's response.<br />
+      <em>Why it matters:</em> Iteration helps you reach the best version of your prompt.
+    </li>
+  </ol>
+
+  <h3>📐 Example Prompt Structure</h3>
+  <div id="examples">
+  <table class="prompt-table">
+    <thead>
+      <tr>
+        <th>Element</th>
+        <th>Example</th>
+        <th>Why This Works</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Role/Context</td>
+        <td>"Act as a Python expert for stock trading."</td>
+        <td>Establishes domain expertise and specialized knowledge. The AI adjusts its vocabulary, assumptions, and depth of explanation to match the expertise level and field requirements.</td>
+      </tr>
+      <tr>
+        <td>Task</td>
+        <td>"Explain how to use pandas for backtesting."</td>
+        <td>Clearly defines the specific objective and scope. This prevents the AI from providing generic responses and ensures focused, actionable output.</td>
+      </tr>
+      <tr>
+        <td>Requirements</td>
+        <td>"Use clear code comments, limit to 10 lines."</td>
+        <td>Sets quality standards and constraints. This ensures the output meets your specific needs for readability, length, and style preferences.</td>
+      </tr>
+      <tr>
+        <td>Input Data</td>
+        <td>"Sample CSV data provided below."</td>
+        <td>Provides concrete context and reference material. This enables the AI to give specific, relevant examples rather than abstract explanations.</td>
+      </tr>
+      <tr>
+        <td>Output Format</td>
+        <td>"Respond with a code block and brief summary."</td>
+        <td>Structures the response for immediate usability. This ensures you get the information in the exact format you need for your workflow.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="prompt-example-container">
+    <div class="example-scenario">
+      <h4>💼 Scenario: Creating a Stock Trading Analysis Tool</h4>
+      <p>Let's see how to apply all 7 elements in a real-world prompt:</p>
+    </div>
+    
+    <div class="complete-prompt-example">
+      <h4>🎯 Complete Enhanced Prompt Example:</h4>
+      <div class="prompt-box">
+        <p><strong>Role:</strong> Act as a senior Python developer specializing in quantitative finance and algorithmic trading.</p>
+        
+        <p><strong>Task:</strong> Create a Python script that analyzes stock price patterns and identifies potential buy/sell signals using moving average crossover strategy.</p>
+        
+        <p><strong>Requirements:</strong> Use pandas for data manipulation, include error handling, add detailed comments, limit to 50 lines of code, explain any financial terms used.</p>
+        
+        <p><strong>Input Data:</strong> I have historical stock data in CSV format with columns: Date, Open, High, Low, Close, Volume. Sample data for AAPL stock from 2023.</p>
+        
+        <p><strong>Output Format:</strong> Provide: 1) Complete code block with syntax highlighting, 2) Brief explanation of the algorithm, 3) Example usage command.</p>
+        
+        <p><strong>Clarity:</strong> Use clear variable names, modular functions, and explain the moving average crossover concept in simple terms.</p>
+        
+        <p><strong>Success Criteria:</strong> The script should clearly identify when short-term MA crosses above/below long-term MA, with timestamps for each signal.</p>
+      </div>
+    </div>
+    
+    <div class="comparison-grid">
+      <div class="comparison-container">
+        <div class="comparison-card weak-example">
+          <h4>❌ Weak Prompt</h4>
+          <div class="weak-prompt">
+            "Write code for stock trading"
+          </div>
+          <ul class="issues-list">
+            <li>Too vague</li>
+            <li>No context or requirements</li>
+            <li>Unclear output expectations</li>
+            <li>No success criteria</li>
+          </ul>
+        </div>
+        
+        <div class="comparison-card good-example">
+          <h4>✅ Strong Prompt</h4>
+          <div class="strong-prompt">
+            Uses all 7 elements shown above
+          </div>
+          <ul class="benefits-list">
+            <li>Clear expertise context</li>
+            <li>Specific, measurable task</li>
+            <li>Detailed requirements</li>
+            <li>Exact data format</li>
+            <li>Structured output format</li>
+            <li>Performance criteria</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+
+  <h3>✅ Best Practices Summary</h3>
+  <div id="practices">
+  <ul class="best-practices">
+    <li>Be specific and detailed about what you want.</li>
+    <li>Provide context and relevant examples.</li>
+    <li>Define the output format clearly.</li>
+    <li>Refine your prompt based on the results you get.</li>
+    <li>Keep language natural and conversational when possible.</li>
+  </ul>
+  </div>
+</section>
+
+<div class="cheat-sheet">
+  <button onclick="printCheatSheet()" class="cta-button print-button">🖨️ Print Cheat Sheet</button>
+  <button onclick="downloadCheatSheet()" class="cta-button download-button">📄 Download PDF</button>
+  <p class="print-note">💡 Tip: Use print preview to adjust layout before printing</p>
+</div>
+
+    <section class="complete">
+      <div id="completion-actions">
+        <button id="complete-btn" onclick="markComplete()">✅ Mark Module 1 Complete</button>
+        <button id="restart-btn" onclick="restartModule()" style="display: none;">🔄 Study This Module Again</button>
+      </div>
+      <p id="status"></p>
+    </section>
+  </main>
+
+  <footer class="module-footer">
+    <a href="index.html">← Back to Home</a>
+  </footer>
+
+  <script>
+    // Copy to clipboard functionality
+    function copyToClipboard(element) {
+      const text = element.textContent.replace(/"/g, '');
+      navigator.clipboard.writeText(text).then(function() {
+        const indicator = element.parentNode.querySelector('.copy-indicator');
+        indicator.classList.add('show');
+        setTimeout(() => {
+          indicator.classList.remove('show');
+        }, 2000);
+      }).catch(function(err) {
+        console.error('Could not copy text: ', err);
+      });
+    }
+
+    // Smooth scrolling to sections
+    function scrollToSection(sectionId) {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+        
+        // Update progress steps
+        updateProgressSteps(sectionId);
+      }
+    }
+
+    // Update progress step states
+    function updateProgressSteps(currentSection) {
+      const steps = document.querySelectorAll('.progress-step');
+      const sections = ['key-insights', 'definition', 'framework', 'examples'];
+      const currentIndex = sections.indexOf(currentSection);
+      
+      steps.forEach((step, index) => {
+        step.classList.remove('active', 'completed');
+        if (index < currentIndex) {
+          step.classList.add('completed');
+        } else if (index === currentIndex) {
+          step.classList.add('active');
+        }
+      });
+    }
+
+    // Intersection Observer for fade-in animations
+    function initScrollAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            
+            // Update progress based on visible section
+            const sectionId = entry.target.id;
+            if (sectionId) {
+              updateProgressSteps(sectionId);
+            }
+          }
+        });
+      }, {
+        threshold: 0.3
+      });
+
+      // Observe all sections with fade-in class
+      document.querySelectorAll('.section-fade-in').forEach(section => {
+        observer.observe(section);
+      });
+    }
+
+    function loadPrompt() {
+      localStorage.setItem('playgroundPrompt', 'Summarize the following article in 3 bullet points: [paste article here]');
+      window.location.href = 'index.html#playground';
+    }
+
+    function markComplete() {
+      localStorage.setItem('module1Complete', 'true');
+      localStorage.setItem('module1CompletedAt', new Date().toISOString());
+      document.getElementById('status').textContent = '🎉 Module 1 Complete! You can now study it again anytime.';
+      
+      // Update progress bar
+      const activeStep = document.querySelector('.step.active');
+      if (activeStep) {
+        activeStep.classList.add('completed');
+      }
+      
+      // Update all progress steps to completed
+      document.querySelectorAll('.progress-step').forEach(step => {
+        step.classList.remove('active');
+        step.classList.add('completed');
+      });
+      
+      // Update completion UI
+      updateCompletionUI();
+    }
+
+    // UPDATE COMPLETION UI
+    function updateCompletionUI() {
+      const completeBtn = document.getElementById('complete-btn');
+      const restartBtn = document.getElementById('restart-btn');
+      
+      if (localStorage.getItem('module1Complete') === 'true') {
+        completeBtn.style.display = 'none';
+        restartBtn.style.display = 'inline-block';
+      } else {
+        completeBtn.style.display = 'inline-block';
+        restartBtn.style.display = 'none';
+      }
+    }
+
+    // RESTART MODULE FUNCTIONALITY
+    function restartModule() {
+      if (confirm('🔄 Are you sure you want to restart this module? This will reset your progress but keep your completion history.')) {
+        // Reset progress indicators
+        document.querySelectorAll('.progress-step').forEach(step => {
+          step.classList.remove('active', 'completed');
+        });
+        document.querySelector('.progress-step').classList.add('active');
+        
+        // Reset form fields
+        document.querySelectorAll('input[type="text"], textarea').forEach(input => {
+          input.value = '';
+        });
+        
+        // Reset status
+        document.getElementById('status').textContent = '';
+        
+        // Show restart notification
+        document.getElementById('status').textContent = '🔄 Module restarted! You can now study through the content again.';
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // Check completion status on load
+    window.onload = function() {
+      // Apply dark mode from localStorage to body as well
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        document.documentElement.classList.add('dark-mode');
+      }
+      
+      // Check module completion status
+      if (localStorage.getItem('module1Complete') === 'true') {
+        const completedAt = localStorage.getItem('module1CompletedAt');
+        const completedDate = completedAt ? new Date(completedAt).toLocaleDateString() : 'previously';
+        document.getElementById('status').textContent = `✅ You completed this module ${completedDate}. You can study it again anytime!`;
+        const activeStep = document.querySelector('.step.active');
+        if (activeStep) {
+          activeStep.classList.add('completed');
+        }
+      }
+      
+      // Update completion UI
+      updateCompletionUI();
+      
+      // Initialize scroll animations
+      initScrollAnimations();
+    };
+
+    function printCheatSheet() {
+      // Hide non-essential elements for printing
+      const elementsToHide = document.querySelectorAll('.cheat-sheet, .module-footer, .progress-bar, .complete');
+      elementsToHide.forEach(el => el.style.display = 'none');
+      
+      // Print
+      window.print();
+      
+      // Restore hidden elements
+      elementsToHide.forEach(el => el.style.display = '');
+    }
+
+    function downloadCheatSheet() {
+      // Create a simplified version for PDF download
+      const content = `
+        PROMPT ENGINEERING CHEAT SHEET - MODULE 1
+        =========================================
+        
+        The 7-Element Prompt Framework:
+        
+        1. Role/Context: Define who the AI should act as
+        2. Task/Objective: Clearly state what you want
+        3. Requirements/Constraints: Specify limitations
+        4. Input Data/Context: Provide relevant information
+        5. Output Format: Specify response format
+        6. Clarity and Conciseness: Use simple, direct language
+        7. Iteration and Refinement: Refine based on results
+        
+        Example Structure:
+        Element | Example | Why This Works
+        --------|---------|---------------
+        Role/Context | "Act as a Python expert for stock trading." | Establishes domain expertise
+        Task | "Explain how to use pandas for backtesting." | Defines specific objective
+        Requirements | "Use clear code comments, limit to 10 lines." | Sets quality standards
+        Input Data | "Sample CSV data provided below." | Provides concrete context
+        Output Format | "Respond with a code block and brief summary." | Structures response
+        
+        Best Practices:
+        • Be specific and detailed about what you want
+        • Provide context and relevant examples
+        • Define the output format clearly
+        • Refine your prompt based on the results you get
+        • Keep language natural and conversational when possible
+      `;
+      
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'prompt-engineering-cheat-sheet-module1.txt';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }
+  </script>
+</body>
+</html>

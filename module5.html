@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Module 5: Context & Specificity Mastery</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Custom styling for Module 5 */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .module-header {
+      background: linear-gradient(135deg, var(--accent, #4a47a3), #6c63ff);
+      color: white;
+      padding: 4rem 1rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .module-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .module-header h1 {
+      font-size: 3rem;
+      margin: 0 0 1rem 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .subtitle {
+      font-size: 1.3rem;
+      margin: 0;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress-wrapper {
+      background: var(--card, #ffffff);
+      border-bottom: 1px solid var(--border, #e0e0e0);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .progress-bar {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .step {
+      padding: 0.7rem 1.2rem;
+      border-radius: 25px;
+      background: var(--light-bg, #f0f0f0);
+      color: var(--text, #666);
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .step.active {
+      background: var(--accent, #4a47a3);
+      color: white;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(74, 71, 163, 0.3);
+    }
+
+    .step.completed {
+      background: var(--success, #22c55e);
+      color: white;
+      border-color: var(--success, #22c55e);
+    }
+
+    .module-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 1rem;
+      line-height: 1.7;
+    }
+
+    .table-of-contents {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0 3rem 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .table-of-contents h3 {
+      margin: 0 0 1.5rem 0;
+      color: var(--accent, #4a47a3);
+      font-size: 1.4rem;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .toc-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .toc-list li {
+      background: var(--light-bg, #f8f9fa);
+      border-radius: 8px;
+      padding: 1rem;
+      transition: all 0.3s ease;
+      border-left: 4px solid var(--accent, #4a47a3);
+    }
+
+    .toc-list li:hover {
+      transform: translateX(5px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .toc-list a {
+      text-decoration: none;
+      color: var(--text, #333);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section {
+      margin: 4rem 0;
+      scroll-margin-top: 100px;
+    }
+
+    .section h2 {
+      color: var(--accent, #4a47a3);
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border, #e0e0e0);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .context-levels {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .level-card {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .level-card.basic {
+      border-left: 4px solid #ef4444;
+    }
+
+    .level-card.good {
+      border-left: 4px solid #f59e0b;
+    }
+
+    .level-card.excellent {
+      border-left: 4px solid #22c55e;
+    }
+
+    .level-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 60px;
+      height: 60px;
+      border-radius: 0 0 0 100%;
+      opacity: 0.1;
+    }
+
+    .level-card.basic::before {
+      background: #ef4444;
+    }
+
+    .level-card.good::before {
+      background: #f59e0b;
+    }
+
+    .level-card.excellent::before {
+      background: #22c55e;
+    }
+
+    .level-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .level-badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .level-badge.basic {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .level-badge.good {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .level-badge.excellent {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    .prompt-example {
+      background: var(--light-bg, #f8f9fa);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      position: relative;
+      border-left: 4px solid var(--accent, #4a47a3);
+    }
+
+    .copy-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--accent, #4a47a3);
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.3s ease;
+    }
+
+    .copy-button:hover {
+      background: var(--accent-dark, #373451);
+      transform: scale(1.05);
+    }
+
+    .context-builder {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 3rem 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .context-layer {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: var(--light-bg, #f8f9fa);
+      border-radius: 8px;
+      border-left: 4px solid var(--accent, #4a47a3);
+      position: relative;
+    }
+
+    .layer-number {
+      position: absolute;
+      top: -0.5rem;
+      left: 1rem;
+      background: var(--accent, #4a47a3);
+      color: white;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .layer-title {
+      margin: 0 0 1rem 0;
+      color: var(--accent, #4a47a3);
+      font-weight: 600;
+      padding-left: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: var(--text, #333);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 1rem;
+      border: 2px solid var(--border, #e0e0e0);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: var(--card, #ffffff);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent, #4a47a3);
+      box-shadow: 0 0 0 3px rgba(74, 71, 163, 0.1);
+    }
+
+    .output-display {
+      background: var(--light-bg, #f8f9fa);
+      border: 2px solid var(--accent, #4a47a3);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      min-height: 150px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 1rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      position: relative;
+    }
+
+    .specificity-spectrum {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+      position: relative;
+    }
+
+    .specificity-spectrum::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e);
+      border-radius: 2px;
+      z-index: 1;
+    }
+
+    .spectrum-item {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .spectrum-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .spectrum-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .context-checklist {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 3rem 0;
+    }
+
+    .checklist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .checklist-category {
+      background: var(--light-bg, #f8f9fa);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .checklist-category h4 {
+      margin: 0 0 1rem 0;
+      color: var(--accent, #4a47a3);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .checklist-items {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .checklist-items li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0.5rem 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .checklist-items li:hover {
+      transform: translateX(5px);
+    }
+
+    .checklist-items input[type="checkbox"] {
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .industry-examples {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .industry-card {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .industry-card:hover {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      transform: translateY(-3px);
+    }
+
+    .industry-header {
+      background: linear-gradient(135deg, var(--accent, #4a47a3), #6c63ff);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+
+    .context-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .comparison-card {
+      padding: 1.5rem;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .comparison-card.vague {
+      background: #fef2f2;
+      border-left: 4px solid #ef4444;
+    }
+
+    .comparison-card.specific {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+    }
+
+    .comparison-label {
+      position: absolute;
+      top: -0.5rem;
+      left: 1rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 15px;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    .comparison-card.vague .comparison-label {
+      background: #ef4444;
+      color: white;
+    }
+
+    .comparison-card.specific .comparison-label {
+      background: #22c55e;
+      color: white;
+    }
+
+    .quiz-section {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 3rem 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .quiz-card {
+      background: var(--light-bg, #f8f9fa);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 1.5rem 0;
+      transition: all 0.3s ease;
+    }
+
+    .quiz-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 0.8rem;
+      margin: 1.5rem 0;
+    }
+
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1rem;
+      background: var(--card, #ffffff);
+      border: 2px solid var(--border, #e0e0e0);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--accent, #4a47a3);
+      background: var(--accent-light, #f0f0ff);
+    }
+
+    .quiz-option.selected {
+      border-color: var(--accent, #4a47a3);
+      background: var(--accent-light, #f0f0ff);
+    }
+
+    .quiz-option.correct {
+      border-color: var(--success, #22c55e);
+      background: var(--success-light, #f0fdf4);
+    }
+
+    .quiz-option.incorrect {
+      border-color: var(--error, #ef4444);
+      background: var(--error-light, #fef2f2);
+    }
+
+    .feedback {
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .feedback.correct {
+      background: var(--success-light, #f0fdf4);
+      color: var(--success-dark, #15803d);
+      border-left: 4px solid var(--success, #22c55e);
+    }
+
+    .feedback.incorrect {
+      background: var(--error-light, #fef2f2);
+      color: var(--error-dark, #dc2626);
+      border-left: 4px solid var(--error, #ef4444);
+    }
+
+    .completion-section {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      margin: 4rem 0;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .completion-section.completed {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      border: none;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+    }
+
+    .btn {
+      background: var(--accent, #4a47a3);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(74, 71, 163, 0.3);
+    }
+
+    .btn.secondary {
+      background: var(--card, #ffffff);
+      color: var(--accent, #4a47a3);
+      border: 2px solid var(--accent, #4a47a3);
+    }
+
+    .btn.secondary:hover {
+      background: var(--accent, #4a47a3);
+      color: white;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 4rem 0 2rem 0;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border, #e0e0e0);
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent, #4a47a3);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      transform: translateX(-5px);
+    }
+
+    .nav-link.next:hover {
+      transform: translateX(5px);
+    }
+
+    /* Animation for fade-in effect */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .module-header h1 {
+        font-size: 2.2rem;
+      }
+
+      .subtitle {
+        font-size: 1.1rem;
+      }
+
+      .progress-bar {
+        gap: 0.5rem;
+      }
+
+      .step {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+      }
+
+      .module-content {
+        padding: 2rem 1rem;
+      }
+
+      .section h2 {
+        font-size: 1.6rem;
+      }
+
+      .context-levels,
+      .industry-examples,
+      .checklist-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .context-comparison {
+        grid-template-columns: 1fr;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .navigation {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+
+    /* Dark Mode Support */
+    .dark-mode .module-header {
+      background: linear-gradient(135deg, var(--accent-dark, #2d2a6c), #1e1b4f);
+    }
+
+    .dark-mode .progress-wrapper {
+      background: var(--card-dark, #1a1a1a);
+      border-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .step {
+      background: var(--light-bg-dark, #333);
+      color: var(--text-dark, #ccc);
+    }
+
+    .dark-mode .table-of-contents,
+    .dark-mode .context-builder,
+    .dark-mode .context-checklist,
+    .dark-mode .industry-card,
+    .dark-mode .quiz-section,
+    .dark-mode .quiz-card,
+    .dark-mode .completion-section,
+    .dark-mode .level-card,
+    .dark-mode .spectrum-item {
+      background: var(--card-dark, #1e1e1e);
+      border-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .table-of-contents h3,
+    .dark-mode .section h2,
+    .dark-mode .context-builder h3,
+    .dark-mode .context-checklist h3,
+    .dark-mode .quiz-section h2,
+    .dark-mode .completion-section h2 {
+      color: var(--accent-dark, #6366f1);
+    }
+
+    .dark-mode .toc-list li,
+    .dark-mode .context-layer,
+    .dark-mode .checklist-category,
+    .dark-mode .prompt-example,
+    .dark-mode .output-display {
+      background: var(--light-bg-dark, #2a2a2a);
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .toc-list li {
+      border-left-color: var(--accent-dark, #6366f1);
+    }
+
+    .dark-mode .toc-list a {
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .form-group label {
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .form-group input,
+    .dark-mode .form-group textarea,
+    .dark-mode .form-group select {
+      background: var(--light-bg-dark, #2a2a2a);
+      border-color: var(--border-dark, #333);
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .form-group input:focus,
+    .dark-mode .form-group textarea:focus,
+    .dark-mode .form-group select:focus {
+      border-color: var(--accent-dark, #6366f1);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .dark-mode .quiz-option {
+      background: var(--card-dark, #1e1e1e);
+      border-color: var(--border-dark, #333);
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .quiz-option:hover,
+    .dark-mode .quiz-option.selected {
+      border-color: var(--accent-dark, #6366f1);
+      background: var(--accent-dark-light, #1e1b4f);
+    }
+
+    .dark-mode .btn {
+      background: var(--accent-dark, #6366f1);
+    }
+
+    .dark-mode .btn:hover {
+      background: var(--accent-dark, #4f46e5);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .dark-mode .btn.secondary {
+      background: var(--card-dark, #1e1e1e);
+      color: var(--accent-dark, #6366f1);
+      border-color: var(--accent-dark, #6366f1);
+    }
+
+    .dark-mode .btn.secondary:hover {
+      background: var(--accent-dark, #6366f1);
+      color: var(--text-light, #ffffff);
+    }
+
+    .dark-mode .navigation {
+      border-top-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .nav-link {
+      color: var(--accent-dark, #6366f1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Dark mode detection script -->
+  <script>
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark-mode');
+    }
+  </script>
+
+  <header class="module-header">
+    <div class="container">
+      <h1>🧭 Module 5: Context & Specificity Mastery</h1>
+      <p class="subtitle">Transform vague requests into laser-focused prompts that deliver exactly what you need through strategic context layering.</p>
+    </div>
+  </header>
+
+  <div class="progress-wrapper">
+    <div class="container">
+      <div class="progress-bar">
+        <span class="step completed" title="Completed">📚 Module 1</span>
+        <span class="step completed" title="Completed">🧠 Module 2</span>
+        <span class="step completed" title="Completed">🧱 Module 3</span>
+        <span class="step completed" title="Completed">🔄 Module 4</span>
+        <span class="step active">🧭 Module 5</span>
+        <span class="step">🎯 Module 6</span>
+        <span class="step">🔧 Module 7</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="module-content">
+    <!-- Table of Contents -->
+    <div class="table-of-contents fade-in">
+      <h3>🎯 What You'll Master in This Module</h3>
+      <ul class="toc-list">
+        <li><a href="#overview">🧭 The Context Advantage</a></li>
+        <li><a href="#levels">📊 Context Quality Levels</a></li>
+        <li><a href="#builder">🛠️ Strategic Context Builder</a></li>
+        <li><a href="#specificity">🎯 The Specificity Spectrum</a></li>
+        <li><a href="#industry">🏢 Industry-Specific Examples</a></li>
+        <li><a href="#quiz">🧠 Knowledge Check</a></li>
+      </ul>
+    </div>
+
+    <!-- Overview Section -->
+    <section id="overview" class="section fade-in">
+      <h2>🧭 The Context Advantage</h2>
+      <p>Context is the difference between getting generic advice and receiving tailored solutions that actually work for your specific situation. Think of context as the GPS coordinates for your AI assistant - without them, even the best AI is just guessing at your destination.</p>
+      
+      <div class="context-comparison">
+        <div class="comparison-card vague">
+          <div class="comparison-label">❌ Vague</div>
+          <h4>Without Context</h4>
+          <div class="prompt-example">
+            "Help me improve my marketing."
+          </div>
+          <p><strong>Result:</strong> Generic marketing tips that may not apply to your business, industry, or situation.</p>
+        </div>
+        
+        <div class="comparison-card specific">
+          <div class="comparison-label">✅ Specific</div>
+          <h4>With Rich Context</h4>
+          <div class="prompt-example">
+            "I run a boutique coffee shop in downtown Portland with 20 regular customers daily. My main competitors are Starbucks (2 blocks away) and a local chain. I want to increase weekend foot traffic by 30% over the next 3 months with a budget under $1000. My current customers love our artisanal beans and cozy atmosphere. Help me improve my marketing."
+          </div>
+          <p><strong>Result:</strong> Specific, actionable strategies tailored to your exact situation, location, budget, and goals.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Context Quality Levels -->
+    <section id="levels" class="section fade-in">
+      <h2>📊 Context Quality Levels</h2>
+      <p>Not all context is created equal. Learn to identify and create different levels of context richness for optimal AI performance.</p>
+      
+      <div class="context-levels">
+        <div class="level-card basic">
+          <div class="level-badge basic">Basic Context</div>
+          <h3>Surface Information</h3>
+          <div class="prompt-example">
+            <button class="copy-button" onclick="copyToClipboard(this)">📋 Copy</button>
+            "Write a business plan for a restaurant."
+          </div>
+          <p><strong>Missing:</strong> Type of restaurant, location, target market, budget, experience level, unique selling points.</p>
+          <p><strong>Result:</strong> Generic template that requires major customization.</p>
+        </div>
+        
+        <div class="level-card good">
+          <div class="level-badge good">Good Context</div>
+          <h3>Detailed Information</h3>
+          <div class="prompt-example">
+            <button class="copy-button" onclick="copyToClipboard(this)">📋 Copy</button>
+            "Write a business plan for a family-owned Italian restaurant in suburban Chicago, targeting families with children, with a $150k startup budget and focus on authentic recipes passed down through generations."
+          </div>
+          <p><strong>Includes:</strong> Restaurant type, location, target market, budget, unique value proposition.</p>
+          <p><strong>Result:</strong> Much more relevant and actionable business plan.</p>
+        </div>
+        
+        <div class="level-card excellent">
+          <div class="level-badge excellent">Excellent Context</div>
+          <h3>Comprehensive Context</h3>
+          <div class="prompt-example">
+            <button class="copy-button" onclick="copyToClipboard(this)">📋 Copy</button>
+            "Write a business plan for 'Nonna's Kitchen,' a family-owned Italian restaurant in Naperville, IL (pop. 150k, median income $89k). Target: families with kids 5-16, couples 35-55. Competition: 3 casual dining chains within 2 miles. Our edge: Grandmother's 70-year-old recipes from Sicily, made-from-scratch pasta, kids eat free Sundays. Budget: $150k startup, break-even goal: 18 months. Owners: Maria (25 years restaurant experience) and Tony (culinary school graduate). Local market: Strong Italian-American community, family-oriented suburb."
+          </div>
+          <p><strong>Includes:</strong> Everything above PLUS demographics, competition analysis, competitive advantages, timeline goals, owner qualifications, and local market insights.</p>
+          <p><strong>Result:</strong> Highly customized, market-specific business plan with actionable insights.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Strategic Context Builder -->
+    <section id="builder" class="section fade-in">
+      <h2>🛠️ Strategic Context Builder</h2>
+      <p>Use our systematic approach to layer context effectively. Each layer adds precision and relevance to your prompts.</p>
+      
+      <div class="context-builder">
+        <h3>🏗️ Build Context Layer by Layer</h3>
+        
+        <div class="context-layer">
+          <div class="layer-number">1</div>
+          <h4 class="layer-title">🎯 Core Objective</h4>
+          <div class="form-group">
+            <label>What do you want to achieve?</label>
+            <input type="text" id="objective" placeholder="e.g., Increase sales, improve team productivity, learn a new skill" />
+          </div>
+        </div>
+        
+        <div class="context-layer">
+          <div class="layer-number">2</div>
+          <h4 class="layer-title">📍 Situational Context</h4>
+          <div class="form-group">
+            <label>Your current situation:</label>
+            <textarea id="situation" rows="3" placeholder="e.g., Small business owner, 5 employees, $2M annual revenue, technology sector"></textarea>
+          </div>
+        </div>
+        
+        <div class="context-layer">
+          <div class="layer-number">3</div>
+          <h4 class="layer-title">⚙️ Constraints & Resources</h4>
+          <div class="form-group">
+            <label>What limitations and resources do you have?</label>
+            <textarea id="constraints" rows="3" placeholder="e.g., Budget: $10k, Timeline: 3 months, Team: 2 marketing specialists, Current tools: HubSpot CRM"></textarea>
+          </div>
+        </div>
+        
+        <div class="context-layer">
+          <div class="layer-number">4</div>
+          <h4 class="layer-title">🎭 Audience & Stakeholders</h4>
+          <div class="form-group">
+            <label>Who are you serving or working with?</label>
+            <textarea id="audience" rows="3" placeholder="e.g., B2B clients, ages 35-50, decision makers in mid-size companies, value efficiency and ROI"></textarea>
+          </div>
+        </div>
+        
+        <div class="context-layer">
+          <div class="layer-number">5</div>
+          <h4 class="layer-title">📊 Success Metrics</h4>
+          <div class="form-group">
+            <label>How will you measure success?</label>
+            <input type="text" id="metrics" placeholder="e.g., 25% increase in qualified leads, reduce response time to under 2 hours" />
+          </div>
+        </div>
+        
+        <div class="context-layer">
+          <div class="layer-number">6</div>
+          <h4 class="layer-title">🌍 Environmental Factors</h4>
+          <div class="form-group">
+            <label>Industry, location, or other relevant context:</label>
+            <textarea id="environment" rows="3" placeholder="e.g., Competitive SaaS market, based in Austin TX, remote team, post-pandemic business environment"></textarea>
+          </div>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn" onclick="generateContextualPrompt()">🚀 Generate Contextual Prompt</button>
+          <button class="btn secondary" onclick="clearContextBuilder()">🗑️ Clear All</button>
+        </div>
+        
+        <div id="contextual-output" class="output-display" style="display: none;">
+          <button class="copy-button" onclick="copyToClipboard(this)">📋 Copy</button>
+          <div id="contextual-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The Specificity Spectrum -->
+    <section id="specificity" class="section fade-in">
+      <h2>🎯 The Specificity Spectrum</h2>
+      <p>Master the balance between being specific enough to get targeted results while avoiding overwhelming detail that confuses your intent.</p>
+      
+      <div class="specificity-spectrum">
+        <div class="spectrum-item">
+          <span class="spectrum-icon">🌫️</span>
+          <h4>Too Vague</h4>
+          <p>"Help my business grow"</p>
+          <small>Lacks direction and measurable goals</small>
+        </div>
+        
+        <div class="spectrum-item">
+          <span class="spectrum-icon">📊</span>
+          <h4>Just Right</h4>
+          <p>"Increase Q4 revenue by 20% through improved customer retention"</p>
+          <small>Clear goal with specific metrics and approach</small>
+        </div>
+        
+        <div class="spectrum-item">
+          <span class="spectrum-icon">📚</span>
+          <h4>Too Detailed</h4>
+          <p>"Increase revenue by exactly 20.3% by December 31st through retention strategies targeting customers who bought products A, B, and C between March-June..."</p>
+          <small>Excessive detail can limit creative solutions</small>
+        </div>
+      </div>
+
+      <!-- Context Checklist -->
+      <div class="context-checklist">
+        <h3>✅ Context Quality Checklist</h3>
+        <p>Use this checklist to ensure you're providing optimal context for any prompt:</p>
+        
+        <div class="checklist-grid">
+          <div class="checklist-category">
+            <h4>🎯 Goal Clarity</h4>
+            <ul class="checklist-items">
+              <li><input type="checkbox" id="check1"> <label for="check1">Specific outcome defined</label></li>
+              <li><input type="checkbox" id="check2"> <label for="check2">Timeline specified</label></li>
+              <li><input type="checkbox" id="check3"> <label for="check3">Success metrics included</label></li>
+              <li><input type="checkbox" id="check4"> <label for="check4">Priority level indicated</label></li>
+            </ul>
+          </div>
+          
+          <div class="checklist-category">
+            <h4>📍 Situational Details</h4>
+            <ul class="checklist-items">
+              <li><input type="checkbox" id="check5"> <label for="check5">Current state described</label></li>
+              <li><input type="checkbox" id="check6"> <label for="check6">Industry/domain specified</label></li>
+              <li><input type="checkbox" id="check7"> <label for="check7">Scale/size indicated</label></li>
+              <li><input type="checkbox" id="check8"> <label for="check8">Key stakeholders identified</label></li>
+            </ul>
+          </div>
+          
+          <div class="checklist-category">
+            <h4>⚙️ Practical Constraints</h4>
+            <ul class="checklist-items">
+              <li><input type="checkbox" id="check9"> <label for="check9">Budget limitations noted</label></li>
+              <li><input type="checkbox" id="check10"> <label for="check10">Resource availability stated</label></li>
+              <li><input type="checkbox" id="check11"> <label for="check11">Technical requirements specified</label></li>
+              <li><input type="checkbox" id="check12"> <label for="check12">Risk tolerance indicated</label></li>
+            </ul>
+          </div>
+          
+          <div class="checklist-category">
+            <h4>🎨 Quality Preferences</h4>
+            <ul class="checklist-items">
+              <li><input type="checkbox" id="check13"> <label for="check13">Style/tone preferences</label></li>
+              <li><input type="checkbox" id="check14"> <label for="check14">Format requirements</label></li>
+              <li><input type="checkbox" id="check15"> <label for="check15">Level of detail specified</label></li>
+              <li><input type="checkbox" id="check16"> <label for="check16">Examples or references provided</label></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Industry-Specific Examples -->
+    <section id="industry" class="section fade-in">
+      <h2>🏢 Industry-Specific Context Examples</h2>
+      <p>See how context changes dramatically across different industries and scenarios. Learn to tailor your approach for maximum relevance.</p>
+      
+      <div class="industry-examples">
+        <div class="industry-card">
+          <div class="industry-header">
+            <span>💼</span> Business Strategy
+          </div>
+          <h4>Weak Context:</h4>
+          <div class="prompt-example">
+            "Help me create a business strategy."
+          </div>
+          
+          <h4>Strong Context:</h4>
+          <div class="prompt-example">
+            <button class="copy-button" onclick="copyToClipboard(this)">📋 Copy</button>
+            "I'm the CEO of a 50-person B2B SaaS company providing project management tools. We're at $8M ARR, growing 25% YoY, but customer acquisition cost increased 40% this year. Our main competitors are Asana and Monday.com. I need a 3-year strategy to reach $25M ARR while improving unit economics. Key challenges: increasing competition, rising marketing costs, need for enterprise features. Strengths: strong customer satisfaction (NPS 65), solid product-market fit in mid-market segment."
+          </div>
+        </div>
+        
+        <div class="industry-card">
+          <div class="industry-header">
+            <span>🎓</span> Education & Training
+          </div>
+          <h4>Weak Context:</h4>
+          <div class="prompt-example">
+            "Design a training program."
+          </div>
+          
+          <h4>Strong Context:</h4>
+          <div class="prompt-example">
+            <button class="copy-button" onclick="copyToClipboard(this)">📋 Copy</button>
+            "Design a 6-week cybersecurity awareness training for 200 non-technical employees at a healthcare organization. Participants: administrative staff, nurses, doctors (ages 25-60, varying tech comfort). Goal: 95% pass rate on security assessment, reduce phishing click rate from 23% to under 5%. Constraints: Max 30 minutes per week, must be mobile-friendly, HIPAA compliance required. Previous training had 40% completion rate due to being too technical and time-consuming."
+          </div>
+        </div>
+        
+        <div class="industry-card">
+          <div class="industry-header">
+            <span>📱</span> Technology & Product
+          </div>
+          <h4>Weak Context:</h4>
+          <div class="prompt-example">
+            "Help me improve my app."
+          </div>
+          
+          <h4>Strong Context:</h4>
+          <div class="prompt-example">
+            <button class="copy-button" onclick="copyToClipboard(this)">📋 Copy</button>
+            "I have a fitness tracking iOS app with 50k monthly active users. Current metrics: 3.2-star rating, 35% day-7 retention, 12% day-30 retention. Main complaints from reviews: confusing onboarding (mentioned in 40% of negative reviews), app crashes during workout logging (15% of complaints). Competitors like MyFitnessPal have 4.5+ stars. Target users: fitness beginners aged 25-40, primarily women, want simple tracking without overwhelming features. Goal: Improve to 4.0+ stars and increase day-30 retention to 25% within 3 months."
+          </div>
+        </div>
+        
+        <div class="industry-card">
+          <div class="industry-header">
+            <span>🎨</span> Creative & Marketing
+          </div>
+          <h4>Weak Context:</h4>
+          <div class="prompt-example">
+            "Create a marketing campaign."
+          </div>
+          
+          <h4>Strong Context:</h4>
+          <div class="prompt-example">
+            <button class="copy-button" onclick="copyToClipboard(this)">📋 Copy</button>
+            "Create a social media campaign for our sustainable fashion brand targeting Gen Z women (18-26) who value ethical consumption. Brand: 'EcoThread' - uses recycled materials, fair trade manufacturing. Previous campaigns focused on product features, but engagement was low (1.2% on Instagram). Competitor 'Reformation' gets 4-6% engagement with lifestyle-focused content. Budget: $15k/month across Instagram, TikTok, Pinterest. Goal: 3x engagement rate and drive 30% increase in website traffic to our new fall collection launch. Brand voice: Authentic, optimistic, educational without being preachy."
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Knowledge Check Quiz -->
+    <section id="quiz" class="section fade-in">
+      <div class="quiz-section">
+        <h2>🧠 Test Your Context & Specificity Skills</h2>
+        <p>Let's see how well you understand the power of strategic context layering!</p>
+        
+        <div id="quiz-container"></div>
+        
+        <div class="action-buttons">
+          <button class="btn" onclick="resetQuiz()">🔄 Retake Quiz</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Completion Section -->
+    <section class="completion-section" id="completion">
+      <h2>🎉 Congratulations!</h2>
+      <p>You've mastered the art of context and specificity! You can now create laser-focused prompts that deliver precisely what you need by providing strategic, layered context.</p>
+      
+      <div class="action-buttons">
+        <div id="completion-actions">
+          <button class="btn" id="complete-btn" onclick="markComplete()">✅ Mark Module 5 Complete</button>
+          <button class="btn" id="restart-btn" onclick="restartModule()" style="display: none;">🔄 Study This Module Again</button>
+        </div>
+      </div>
+      
+      <div id="completion-status"></div>
+    </section>
+
+    <!-- Navigation -->
+    <div class="navigation">
+      <a href="module4.html" class="nav-link">← Previous: Refining Outputs</a>
+      <a href="module6.html" class="nav-link next">Next: Advanced Techniques →</a>
+    </div>
+
+    <!-- Home Link -->
+    <div style="text-align: center; margin: 2rem 0;">
+      <a href="index.html" class="btn secondary">🏠 Back to Home</a>
+    </div>
+  </main>
+
+  <script>
+    // Quiz data for Module 5
+    const quizData = [
+      {
+        question: "Which prompt provides the most effective context for getting actionable advice?",
+        options: [
+          "Help me with my marketing",
+          "I need marketing help for my business",
+          "Help me increase sales for my coffee shop",
+          "Help me increase weekend sales by 30% for my downtown coffee shop that competes with Starbucks, with a $1000 budget and focus on local customers who value artisanal quality"
+        ],
+        answer: 3,
+        explanation: "The last option provides comprehensive context including specific goals, location, competition, budget, and target customer insights."
+      },
+      {
+        question: "What's the main problem with this prompt: 'Make my website better'?",
+        options: [
+          "It's too short",
+          "It lacks specific goals, context, and success metrics",
+          "It doesn't mention the website URL",
+          "It's not polite enough"
+        ],
+        answer: 1,
+        explanation: "The prompt lacks essential context like what 'better' means, what problems exist, who the audience is, and how to measure improvement."
+      },
+      {
+        question: "Which context layer is most important for getting relevant solutions?",
+        options: [
+          "Environmental factors only",
+          "All layers work together equally",
+          "Constraints and resources only",
+          "Success metrics only"
+        ],
+        answer: 1,
+        explanation: "All context layers work together - objective, situation, constraints, audience, metrics, and environment all contribute to relevant solutions."
+      },
+      {
+        question: "When is a prompt considered 'too detailed' with context?",
+        options: [
+          "When it's longer than 100 words",
+          "When excessive detail limits creative solutions and focuses on irrelevant specifics",
+          "When it mentions specific numbers",
+          "When it includes industry jargon"
+        ],
+        answer: 1,
+        explanation: "A prompt becomes too detailed when it includes irrelevant specifics that constrain creativity without adding value to the solution."
+      },
+      {
+        question: "What makes industry-specific context particularly powerful?",
+        options: [
+          "It sounds more professional",
+          "It helps AI understand domain-specific challenges, constraints, and best practices",
+          "It makes prompts longer",
+          "It impresses colleagues"
+        ],
+        answer: 1,
+        explanation: "Industry-specific context helps AI understand unique challenges, regulations, best practices, and success metrics relevant to that field."
+      }
+    ];
+
+    // Initialize quiz
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+      
+      quizData.forEach((q, index) => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+        card.innerHTML = `
+          <h4>Question ${index + 1}</h4>
+          <p><strong>${q.question}</strong></p>
+          <div class="quiz-options">
+            ${q.options.map((opt, i) => `
+              <label class="quiz-option" onclick="selectOption(${index}, ${i})">
+                <input type="radio" name="q${index}" value="${i}" style="display: none;" />
+                <span>${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+          <button class="btn" onclick="checkAnswer(${index}, ${q.answer})" style="margin-top: 1rem;">Check Answer</button>
+          <div id="feedback${index}" class="feedback" style="display: none;"></div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function selectOption(questionIndex, optionIndex) {
+      const question = document.querySelectorAll('.quiz-card')[questionIndex];
+      const options = question.querySelectorAll('.quiz-option');
+      
+      options.forEach(opt => opt.classList.remove('selected'));
+      options[optionIndex].classList.add('selected');
+      
+      const radio = question.querySelector(`input[value="${optionIndex}"]`);
+      radio.checked = true;
+    }
+
+    function checkAnswer(questionIndex, correctAnswer) {
+      const question = document.querySelectorAll('.quiz-card')[questionIndex];
+      const selected = question.querySelector('input[name="q' + questionIndex + '"]:checked');
+      const feedback = document.getElementById(`feedback${questionIndex}`);
+      const options = question.querySelectorAll('.quiz-option');
+      
+      if (!selected) {
+        feedback.textContent = "⚠️ Please select an answer first.";
+        feedback.className = "feedback incorrect";
+        feedback.style.display = "block";
+        return;
+      }
+      
+      const selectedValue = parseInt(selected.value);
+      
+      // Reset all options
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+      
+      if (selectedValue === correctAnswer) {
+        options[selectedValue].classList.add('correct');
+        feedback.textContent = "✅ Correct! " + quizData[questionIndex].explanation;
+        feedback.className = "feedback correct";
+      } else {
+        options[selectedValue].classList.add('incorrect');
+        options[correctAnswer].classList.add('correct');
+        feedback.textContent = "❌ Not quite right. " + quizData[questionIndex].explanation;
+        feedback.className = "feedback incorrect";
+      }
+      
+      feedback.style.display = "block";
+    }
+
+    function resetQuiz() {
+      renderQuiz();
+    }
+
+    // Context builder functionality
+    function generateContextualPrompt() {
+      const objective = document.getElementById('objective').value.trim();
+      const situation = document.getElementById('situation').value.trim();
+      const constraints = document.getElementById('constraints').value.trim();
+      const audience = document.getElementById('audience').value.trim();
+      const metrics = document.getElementById('metrics').value.trim();
+      const environment = document.getElementById('environment').value.trim();
+      
+      if (!objective) {
+        alert('Please fill in at least your core objective to generate a contextual prompt.');
+        return;
+      }
+      
+      let prompt = '';
+      
+      // Start with situation context if provided
+      if (situation) {
+        prompt += `Context: ${situation}. `;
+      }
+      
+      // Add the main objective
+      prompt += `I want to ${objective}. `;
+      
+      // Add constraints and resources
+      if (constraints) {
+        prompt += `My constraints and resources: ${constraints}. `;
+      }
+      
+      // Add audience information
+      if (audience) {
+        prompt += `Target audience: ${audience}. `;
+      }
+      
+      // Add success metrics
+      if (metrics) {
+        prompt += `Success will be measured by: ${metrics}. `;
+      }
+      
+      // Add environmental factors
+      if (environment) {
+        prompt += `Additional context: ${environment}. `;
+      }
+      
+      // Add a request for specific, actionable advice
+      prompt += `Please provide specific, actionable recommendations tailored to my situation.`;
+      
+      document.getElementById('contextual-result').textContent = prompt;
+      document.getElementById('contextual-output').style.display = 'block';
+      
+      // Scroll to result
+      document.getElementById('contextual-output').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
+
+    function clearContextBuilder() {
+      document.getElementById('objective').value = '';
+      document.getElementById('situation').value = '';
+      document.getElementById('constraints').value = '';
+      document.getElementById('audience').value = '';
+      document.getElementById('metrics').value = '';
+      document.getElementById('environment').value = '';
+      document.getElementById('contextual-output').style.display = 'none';
+    }
+
+    // Copy functionality
+    function copyToClipboard(button) {
+      const parent = button.parentElement;
+      const textToCopy = parent.textContent.replace('📋 Copy', '').trim();
+      
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalText = button.textContent;
+        button.textContent = '✅ Copied!';
+        button.style.background = '#22c55e';
+        
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.background = '';
+        }, 2000);
+      }).catch(() => {
+        alert('Copy failed. Please try selecting and copying manually.');
+      });
+    }
+
+    // Completion functionality
+    function markComplete() {
+      localStorage.setItem('module5Complete', 'true');
+      localStorage.setItem('module5CompletedAt', new Date().toISOString());
+      const section = document.getElementById('completion');
+      const status = document.getElementById('completion-status');
+      
+      section.classList.add('completed');
+      status.innerHTML = `
+        <h3>🎉 Module 5 Complete!</h3>
+        <p>Excellent work! You've mastered context and specificity. You can study this module again anytime!</p>
+        <a href="module6.html" class="btn">🚀 Continue to Module 6</a>
+      `;
+      
+      // Update completion UI
+      updateCompletionUI();
+      
+      // Update progress in home page
+      window.dispatchEvent(new Event('moduleCompleted'));
+    }
+
+    // UPDATE COMPLETION UI
+    function updateCompletionUI() {
+      const completeBtn = document.getElementById('complete-btn');
+      const restartBtn = document.getElementById('restart-btn');
+      
+      if (localStorage.getItem('module5Complete') === 'true') {
+        completeBtn.style.display = 'none';
+        restartBtn.style.display = 'inline-block';
+      } else {
+        completeBtn.style.display = 'inline-block';
+        restartBtn.style.display = 'none';
+      }
+    }
+
+    // RESTART MODULE FUNCTIONALITY
+    function restartModule() {
+      if (confirm('🔄 Are you sure you want to restart this module? This will reset your progress but keep your completion history.')) {
+        // Reset completion section
+        const section = document.getElementById('completion');
+        const status = document.getElementById('completion-status');
+        section.classList.remove('completed');
+        status.innerHTML = '';
+        
+        // Reset all quiz attempts
+        document.querySelectorAll('.quiz-question').forEach(question => {
+          question.classList.remove('answered');
+          const buttons = question.querySelectorAll('button');
+          buttons.forEach(btn => {
+            btn.classList.remove('correct', 'incorrect');
+            btn.disabled = false;
+          });
+        });
+        
+        // Reset form fields
+        document.querySelectorAll('input[type="text"], textarea').forEach(input => {
+          input.value = '';
+        });
+        
+        // Show restart notification
+        status.innerHTML = '<p>🔄 Module restarted! You can now study through the content again.</p>';
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Fade-in animation on scroll
+    function addScrollAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, {
+        threshold: 0.1
+      });
+
+      document.querySelectorAll('.fade-in').forEach(section => {
+        observer.observe(section);
+      });
+    }
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      renderQuiz();
+      addScrollAnimations();
+      
+      // Check if module is already completed
+      if (localStorage.getItem('module5Complete') === 'true') {
+        const section = document.getElementById('completion');
+        const status = document.getElementById('completion-status');
+        const completedAt = localStorage.getItem('module5CompletedAt');
+        const completedDate = completedAt ? new Date(completedAt).toLocaleDateString() : 'previously';
+        section.classList.add('completed');
+        status.innerHTML = `
+          <h3>✅ Module 5 Already Complete!</h3>
+          <p>Great job! You completed this module ${completedDate}. You can study it again anytime!</p>
+          <a href="module6.html" class="btn">🚀 Continue to Module 6</a>
+        `;
+      }
+      
+      // Update completion UI
+      updateCompletionUI();
+    });
+  </script>
+</body>
+</html>

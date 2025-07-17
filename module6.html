@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Module 6: Advanced Layered Prompting</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Custom styling for Module 6 */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .module-header {
+      background: linear-gradient(135deg, var(--accent, #4a47a3), #8b5cf6);
+      color: white;
+      padding: 4rem 1rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .module-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="layers" width="15" height="15" patternUnits="userSpaceOnUse"><rect width="15" height="3" y="0" fill="rgba(255,255,255,0.1)"/><rect width="15" height="3" y="6" fill="rgba(255,255,255,0.05)"/><rect width="15" height="3" y="12" fill="rgba(255,255,255,0.08)"/></pattern></defs><rect width="100" height="100" fill="url(%23layers)"/></svg>');
+      opacity: 0.4;
+    }
+
+    .module-header h1 {
+      font-size: 3rem;
+      margin: 0 0 1rem 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .subtitle {
+      font-size: 1.3rem;
+      margin: 0;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress-wrapper {
+      background: var(--card, #ffffff);
+      border-bottom: 1px solid var(--border, #e0e0e0);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .progress-bar {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .step {
+      padding: 0.7rem 1.2rem;
+      border-radius: 25px;
+      background: var(--light-bg, #f0f0f0);
+      color: var(--text, #666);
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .step.active {
+      background: var(--accent, #4a47a3);
+      color: white;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(74, 71, 163, 0.3);
+    }
+
+    .step.completed {
+      background: var(--success, #22c55e);
+      color: white;
+      border-color: var(--success, #22c55e);
+    }
+
+    .module-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 1rem;
+      line-height: 1.7;
+    }
+
+    .table-of-contents {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0 3rem 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .table-of-contents h3 {
+      margin: 0 0 1.5rem 0;
+      color: var(--accent, #4a47a3);
+      font-size: 1.4rem;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .toc-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .toc-list li {
+      background: var(--light-bg, #f8f9fa);
+      border-radius: 8px;
+      padding: 1rem;
+      transition: all 0.3s ease;
+      border-left: 4px solid var(--accent, #4a47a3);
+    }
+
+    .toc-list li:hover {
+      transform: translateX(5px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .toc-list a {
+      text-decoration: none;
+      color: var(--text, #333);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section {
+      margin: 4rem 0;
+      scroll-margin-top: 100px;
+    }
+
+    .section h2 {
+      color: var(--accent, #4a47a3);
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border, #e0e0e0);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .layer-visualization {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 3rem 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .layer-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .layer {
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      border: 2px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .layer:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .layer.foundation {
+      border-color: #3b82f6;
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    }
+
+    .layer.enhancement {
+      border-color: #8b5cf6;
+      background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    }
+
+    .layer.refinement {
+      border-color: #10b981;
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    }
+
+    .layer-number {
+      position: absolute;
+      top: -10px;
+      left: 1rem;
+      background: var(--accent, #4a47a3);
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .layer-title {
+      font-weight: 600;
+      color: var(--accent, #4a47a3);
+      margin: 0 0 0.5rem 0;
+      font-size: 1.1rem;
+    }
+
+    .layer-description {
+      color: var(--text, #555);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .strategy-showcase {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .strategy-card {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .strategy-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent, #4a47a3), #8b5cf6);
+    }
+
+    .strategy-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .strategy-card .icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .strategy-card h3 {
+      color: var(--accent, #4a47a3);
+      margin-bottom: 1rem;
+    }
+
+    .prompt-example {
+      background: var(--light-bg, #f8f9fa);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      border-left: 4px solid var(--accent, #4a47a3);
+    }
+
+    .interactive-builder {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 3rem 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .builder-step {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: var(--light-bg, #f8f9fa);
+      border-radius: 8px;
+      border-left: 4px solid var(--accent, #4a47a3);
+    }
+
+    .builder-step h4 {
+      margin: 0 0 1rem 0;
+      color: var(--accent, #4a47a3);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: var(--text, #333);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 1rem;
+      border: 2px solid var(--border, #e0e0e0);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: var(--card, #ffffff);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent, #4a47a3);
+      box-shadow: 0 0 0 3px rgba(74, 71, 163, 0.1);
+    }
+
+    .output-display {
+      background: var(--light-bg, #f8f9fa);
+      border: 2px solid var(--accent, #4a47a3);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      min-height: 100px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 1rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      position: relative;
+    }
+
+    .copy-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--accent, #4a47a3);
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.3s ease;
+    }
+
+    .copy-button:hover {
+      background: var(--accent-dark, #373451);
+      transform: scale(1.05);
+    }
+
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .example-card {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .example-card:hover {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      transform: translateY(-3px);
+    }
+
+    .example-title {
+      background: linear-gradient(135deg, var(--accent, #4a47a3), #8b5cf6);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 25px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .layer-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .demo-layer {
+      padding: 1rem;
+      border-radius: 8px;
+      position: relative;
+      border-left: 4px solid;
+    }
+
+    .demo-layer.base {
+      background: #f0f9ff;
+      border-left-color: #0284c7;
+    }
+
+    .demo-layer.enhancement {
+      background: #faf5ff;
+      border-left-color: #8b5cf6;
+    }
+
+    .demo-layer.polish {
+      background: #f0fdf4;
+      border-left-color: #22c55e;
+    }
+
+    .layer-label {
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: var(--accent, #4a47a3);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .quiz-section {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 3rem 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .quiz-card {
+      background: var(--light-bg, #f8f9fa);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 1.5rem 0;
+      transition: all 0.3s ease;
+    }
+
+    .quiz-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 0.8rem;
+      margin: 1.5rem 0;
+    }
+
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1rem;
+      background: var(--card, #ffffff);
+      border: 2px solid var(--border, #e0e0e0);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--accent, #4a47a3);
+      background: var(--accent-light, #f0f0ff);
+    }
+
+    .quiz-option.selected {
+      border-color: var(--accent, #4a47a3);
+      background: var(--accent-light, #f0f0ff);
+    }
+
+    .quiz-option.correct {
+      border-color: var(--success, #22c55e);
+      background: var(--success-light, #f0fdf4);
+    }
+
+    .quiz-option.incorrect {
+      border-color: var(--error, #ef4444);
+      background: var(--error-light, #fef2f2);
+    }
+
+    .feedback {
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .feedback.correct {
+      background: var(--success-light, #f0fdf4);
+      color: var(--success-dark, #15803d);
+      border-left: 4px solid var(--success, #22c55e);
+    }
+
+    .feedback.incorrect {
+      background: var(--error-light, #fef2f2);
+      color: var(--error-dark, #dc2626);
+      border-left: 4px solid var(--error, #ef4444);
+    }
+
+    .completion-section {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      margin: 4rem 0;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .completion-section.completed {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      border: none;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+    }
+
+    .btn {
+      background: var(--accent, #4a47a3);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(74, 71, 163, 0.3);
+    }
+
+    .btn.secondary {
+      background: var(--card, #ffffff);
+      color: var(--accent, #4a47a3);
+      border: 2px solid var(--accent, #4a47a3);
+    }
+
+    .btn.secondary:hover {
+      background: var(--accent, #4a47a3);
+      color: white;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 4rem 0 2rem 0;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border, #e0e0e0);
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent, #4a47a3);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      transform: translateX(-5px);
+    }
+
+    .nav-link.next:hover {
+      transform: translateX(5px);
+    }
+
+    /* Animation for fade-in effect */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .module-header h1 {
+        font-size: 2.2rem;
+      }
+
+      .subtitle {
+        font-size: 1.1rem;
+      }
+
+      .progress-bar {
+        gap: 0.5rem;
+      }
+
+      .step {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+      }
+
+      .module-content {
+        padding: 2rem 1rem;
+      }
+
+      .section h2 {
+        font-size: 1.6rem;
+      }
+
+      .strategy-showcase,
+      .examples-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .navigation {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+
+    /* Dark Mode Support */
+    .dark-mode .module-header {
+      background: linear-gradient(135deg, var(--accent-dark, #2d2a6c), #6b21a8);
+    }
+
+    .dark-mode .progress-wrapper {
+      background: var(--card-dark, #1a1a1a);
+      border-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .step {
+      background: var(--light-bg-dark, #333);
+      color: var(--text-dark, #ccc);
+    }
+
+    .dark-mode .table-of-contents {
+      background: var(--card-dark, #1e1e1e);
+      border-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .table-of-contents h3 {
+      color: var(--accent-dark, #8b5cf6);
+    }
+
+    .dark-mode .toc-list li {
+      background: var(--light-bg-dark, #2a2a2a);
+      border-left-color: var(--accent-dark, #8b5cf6);
+    }
+
+    .dark-mode .toc-list a {
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .section h2 {
+      color: var(--accent-dark, #8b5cf6);
+      border-bottom-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .layer-visualization,
+    .dark-mode .strategy-card,
+    .dark-mode .interactive-builder,
+    .dark-mode .example-card,
+    .dark-mode .quiz-section,
+    .dark-mode .quiz-card,
+    .dark-mode .completion-section {
+      background: var(--card-dark, #1e1e1e);
+      border-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .layer {
+      background: linear-gradient(135deg, #2a2a2a, #333);
+      border-color: var(--border-dark, #444);
+    }
+
+    .dark-mode .layer.foundation {
+      border-color: #3b82f6;
+      background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+    }
+
+    .dark-mode .layer.enhancement {
+      border-color: #8b5cf6;
+      background: linear-gradient(135deg, #581c87, #7c3aed);
+    }
+
+    .dark-mode .layer.refinement {
+      border-color: #10b981;
+      background: linear-gradient(135deg, #064e3b, #059669);
+    }
+
+    .dark-mode .strategy-card::before {
+      background: linear-gradient(90deg, var(--accent-dark, #8b5cf6), #a855f7);
+    }
+
+    .dark-mode .strategy-card h3,
+    .dark-mode .interactive-builder h3,
+    .dark-mode .quiz-section h2,
+    .dark-mode .completion-section h2 {
+      color: var(--accent-dark, #8b5cf6);
+    }
+
+    .dark-mode .prompt-example,
+    .dark-mode .builder-step,
+    .dark-mode .output-display {
+      background: var(--light-bg-dark, #2a2a2a);
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .form-group label {
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .form-group input,
+    .dark-mode .form-group textarea,
+    .dark-mode .form-group select {
+      background: var(--light-bg-dark, #2a2a2a);
+      border-color: var(--border-dark, #333);
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .form-group input:focus,
+    .dark-mode .form-group textarea:focus,
+    .dark-mode .form-group select:focus {
+      border-color: var(--accent-dark, #8b5cf6);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+
+    .dark-mode .quiz-option {
+      background: var(--card-dark, #1e1e1e);
+      border-color: var(--border-dark, #333);
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .quiz-option:hover,
+    .dark-mode .quiz-option.selected {
+      border-color: var(--accent-dark, #8b5cf6);
+      background: var(--accent-dark-light, #2d1b69);
+    }
+
+    .dark-mode .btn {
+      background: var(--accent-dark, #8b5cf6);
+    }
+
+    .dark-mode .btn:hover {
+      background: var(--accent-dark, #7c3aed);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    .dark-mode .btn.secondary {
+      background: var(--card-dark, #1e1e1e);
+      color: var(--accent-dark, #8b5cf6);
+      border-color: var(--accent-dark, #8b5cf6);
+    }
+
+    .dark-mode .btn.secondary:hover {
+      background: var(--accent-dark, #8b5cf6);
+      color: var(--text-light, #ffffff);
+    }
+
+    .dark-mode .navigation {
+      border-top-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .nav-link {
+      color: var(--accent-dark, #8b5cf6);
+    }
+  </style>
+</head>
+<body>
+  <!-- Dark mode detection script -->
+  <script>
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark-mode');
+    }
+  </script>
+
+  <header class="module-header">
+    <div class="container">
+      <h1>🧱 Module 6: Advanced Layered Prompting</h1>
+      <p class="subtitle">Master the art of stacking instructions to guide AI through complex, multi-dimensional reasoning tasks.</p>
+    </div>
+  </header>
+
+  <div class="progress-wrapper">
+    <div class="container">
+      <div class="progress-bar">
+        <span class="step completed" title="Completed">📚 Module 1</span>
+        <span class="step completed" title="Completed">🧠 Module 2</span>
+        <span class="step completed" title="Completed">🧱 Module 3</span>
+        <span class="step completed" title="Completed">🔄 Module 4</span>
+        <span class="step completed" title="Completed">🧭 Module 5</span>
+        <span class="step active">🎯 Module 6</span>
+        <span class="step">🔧 Module 7</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="module-content">
+    <!-- Table of Contents -->
+    <div class="table-of-contents fade-in">
+      <h3>🎯 What You'll Master in This Module</h3>
+      <ul class="toc-list">
+        <li><a href="#overview">🧱 Understanding Layered Prompting</a></li>
+        <li><a href="#architecture">🏗️ The Three-Layer Architecture</a></li>
+        <li><a href="#strategies">⚡ Advanced Layering Strategies</a></li>
+        <li><a href="#builder">🛠️ Interactive Layer Builder</a></li>
+        <li><a href="#examples">💡 Real-World Applications</a></li>
+        <li><a href="#quiz">🧠 Mastery Assessment</a></li>
+      </ul>
+    </div>
+
+    <!-- Overview Section -->
+    <section id="overview" class="section fade-in">
+      <h2>🧱 Understanding Layered Prompting</h2>
+      <p>Think of layered prompting like constructing a building. You need a solid foundation (core task), structural elements (constraints and context), and finishing touches (style and format). Each layer serves a specific purpose and builds upon the previous one to create sophisticated, nuanced AI responses.</p>
+      
+      <div class="layer-visualization">
+        <h3>📊 The Anatomy of a Layered Prompt</h3>
+        <div class="layer-stack">
+          <div class="layer refinement">
+            <div class="layer-number">3</div>
+            <div class="layer-title">🎨 Refinement Layer</div>
+            <div class="layer-description">Style, tone, format, and presentation specifications that polish the final output</div>
+          </div>
+          
+          <div class="layer enhancement">
+            <div class="layer-number">2</div>
+            <div class="layer-title">⚡ Enhancement Layer</div>
+            <div class="layer-description">Constraints, context, examples, and specific requirements that shape the response</div>
+          </div>
+          
+          <div class="layer foundation">
+            <div class="layer-number">1</div>
+            <div class="layer-title">🏗️ Foundation Layer</div>
+            <div class="layer-description">The core task or primary objective - what you want the AI to accomplish</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="strategy-showcase">
+        <div class="strategy-card">
+          <span class="icon">🎯</span>
+          <h3>Precision Control</h3>
+          <p>Each layer adds specific instructions, giving you granular control over every aspect of the AI's response.</p>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">🔄</span>
+          <h3>Modular Design</h3>
+          <p>Layers can be mixed, matched, and reused across different prompts for consistent results.</p>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">🚀</span>
+          <h3>Scalable Complexity</h3>
+          <p>Start simple and add layers as needed to handle increasingly complex tasks.</p>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">🧠</span>
+          <h3>Cognitive Guidance</h3>
+          <p>Layers guide the AI's reasoning process step-by-step toward your desired outcome.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="section fade-in">
+      <h2>🏗️ The Three-Layer Architecture</h2>
+      <p>Master this proven framework that transforms simple requests into sophisticated, multi-dimensional prompts.</p>
+      
+      <div class="examples-grid">
+        <div class="example-card">
+          <div class="example-title">
+            <span>🏗️</span> Foundation Layer
+          </div>
+          <div class="layer-demo">
+            <div class="demo-layer base">
+              <div class="layer-label">Core Task</div>
+              <p>"Analyze the impact of remote work on team productivity"</p>
+            </div>
+          </div>
+          <p><strong>Purpose:</strong> Establishes the primary objective. Clear, actionable, and specific about what you want accomplished.</p>
+          <div class="prompt-example">
+Examples:
+• "Write a marketing email for our new product"
+• "Explain quantum computing concepts"
+• "Create a project timeline for website development"</div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-title">
+            <span>⚡</span> Enhancement Layer
+          </div>
+          <div class="layer-demo">
+            <div class="demo-layer base">
+              <div class="layer-label">Foundation</div>
+              <p>"Analyze the impact of remote work on team productivity"</p>
+            </div>
+            <div class="demo-layer enhancement">
+              <div class="layer-label">Enhancement</div>
+              <p>"Focus on software development teams of 5-15 people. Include both quantitative data and qualitative insights. Address common challenges and proven solutions."</p>
+            </div>
+          </div>
+          <p><strong>Purpose:</strong> Adds context, constraints, and requirements that shape the direction and depth of the response.</p>
+          <div class="prompt-example">
+Enhancement Types:
+• Audience specification: "for C-level executives"
+• Scope definition: "focusing on the last 2 years"
+• Required elements: "include 3 case studies"
+• Context setting: "in the healthcare industry"</div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-title">
+            <span>🎨</span> Refinement Layer
+          </div>
+          <div class="layer-demo">
+            <div class="demo-layer base">
+              <div class="layer-label">Foundation</div>
+              <p>"Analyze the impact of remote work on team productivity"</p>
+            </div>
+            <div class="demo-layer enhancement">
+              <div class="layer-label">Enhancement</div>
+              <p>"Focus on software development teams of 5-15 people. Include both quantitative data and qualitative insights."</p>
+            </div>
+            <div class="demo-layer polish">
+              <div class="layer-label">Refinement</div>
+              <p>"Present as an executive summary with bullet points. Use professional but accessible language. Include actionable recommendations at the end."</p>
+            </div>
+          </div>
+          <p><strong>Purpose:</strong> Defines style, format, tone, and presentation to ensure the output matches your exact needs.</p>
+          <div class="prompt-example">
+Refinement Types:
+• Format: "as a numbered list" or "in table format"
+• Tone: "conversational and encouraging"
+• Style: "like a TED talk opening"
+• Length: "in exactly 200 words"
+• Structure: "with clear sections and headers"</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Advanced Strategies Section -->
+    <section id="strategies" class="section fade-in">
+      <h2>⚡ Advanced Layering Strategies</h2>
+      <p>Take your layered prompting to the next level with these professional techniques used by AI experts.</p>
+      
+      <div class="strategy-showcase">
+        <div class="strategy-card">
+          <span class="icon">🔄</span>
+          <h3>Sequential Layering</h3>
+          <p>Build layers that create a logical progression of reasoning.</p>
+          <div class="prompt-example">
+Layer 1: "Identify the main challenges in project management"
+Layer 2: "For each challenge, explain its root causes"
+Layer 3: "Provide specific solutions with implementation steps"</div>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">🎭</span>
+          <h3>Perspective Layering</h3>
+          <p>Add multiple viewpoints for comprehensive analysis.</p>
+          <div class="prompt-example">
+Layer 1: "Evaluate this business strategy"
+Layer 2: "Consider perspectives from customers, employees, and investors"
+Layer 3: "Present findings in a balanced, objective tone"</div>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">🎯</span>
+          <h3>Constraint Stacking</h3>
+          <p>Use multiple constraint layers for precise control.</p>
+          <div class="prompt-example">
+Layer 1: "Write a product description"
+Layer 2: "Target busy professionals, highlight time-saving benefits"
+Layer 3: "Maximum 100 words, include call-to-action"</div>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">🧠</span>
+          <h3>Cognitive Scaffolding</h3>
+          <p>Guide the AI's thinking process step-by-step.</p>
+          <div class="prompt-example">
+Layer 1: "Solve this complex problem"
+Layer 2: "First analyze the situation, then brainstorm solutions"
+Layer 3: "Rank solutions by feasibility and present the top 3"</div>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">📊</span>
+          <h3>Output Shaping</h3>
+          <p>Stack format requirements for perfect presentation.</p>
+          <div class="prompt-example">
+Layer 1: "Create a weekly report"
+Layer 2: "Include metrics, achievements, and next week's goals"
+Layer 3: "Use bullet points, professional tone, max 1 page"</div>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">🔍</span>
+          <h3>Quality Assurance Layering</h3>
+          <p>Add verification and improvement instructions.</p>
+          <div class="prompt-example">
+Layer 1: "Write a technical explanation"
+Layer 2: "Ensure accuracy and include relevant examples"
+Layer 3: "Review for clarity and accessibility, revise if needed"</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Builder Section -->
+    <section id="builder" class="section fade-in">
+      <h2>🛠️ Interactive Layer Builder</h2>
+      <p>Practice building layered prompts with our interactive tool. Start with a foundation and watch your prompt grow in sophistication!</p>
+      
+      <div class="interactive-builder">
+        <h3>🏗️ Build Your Layered Prompt</h3>
+        
+        <div class="builder-step">
+          <h4>🏗️ Foundation Layer: Core Task</h4>
+          <div class="form-group">
+            <label>What do you want the AI to accomplish?</label>
+            <textarea id="foundation-task" rows="2" placeholder="e.g., Create a social media strategy for a sustainable fashion brand"></textarea>
+            <small>Be specific and actionable. This is your primary objective.</small>
+          </div>
+        </div>
+        
+        <div class="builder-step">
+          <h4>⚡ Enhancement Layer: Context & Constraints</h4>
+          <div class="form-group">
+            <label>Target Audience:</label>
+            <input type="text" id="enhancement-audience" placeholder="e.g., environmentally conscious millennials">
+          </div>
+          <div class="form-group">
+            <label>Specific Requirements:</label>
+            <textarea id="enhancement-requirements" rows="2" placeholder="e.g., Include Instagram and TikTok focus, emphasize transparency, address fast fashion concerns"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Context or Industry:</label>
+            <input type="text" id="enhancement-context" placeholder="e.g., competitive fashion market, sustainability focus">
+          </div>
+        </div>
+        
+        <div class="builder-step">
+          <h4>🎨 Refinement Layer: Style & Format</h4>
+          <div class="form-group">
+            <label>Output Format:</label>
+            <select id="refinement-format">
+              <option value="">Choose format...</option>
+              <option value="bullet-points">Bullet point list</option>
+              <option value="numbered-steps">Numbered steps</option>
+              <option value="table">Table format</option>
+              <option value="executive-summary">Executive summary</option>
+              <option value="detailed-plan">Detailed action plan</option>
+              <option value="presentation-outline">Presentation outline</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tone and Style:</label>
+            <select id="refinement-tone">
+              <option value="">Choose tone...</option>
+              <option value="professional">Professional and formal</option>
+              <option value="conversational">Conversational and friendly</option>
+              <option value="authoritative">Authoritative and expert</option>
+              <option value="creative">Creative and inspiring</option>
+              <option value="practical">Practical and action-oriented</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Length/Scope:</label>
+            <input type="text" id="refinement-length" placeholder="e.g., 500 words, 10 key points, 3-month timeline">
+          </div>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn" onclick="generateLayeredPrompt()">🚀 Build Layered Prompt</button>
+          <button class="btn secondary" onclick="clearBuilder()">🗑️ Clear All</button>
+        </div>
+        
+        <div id="layered-output" class="output-display" style="display: none;">
+          <button class="copy-button" onclick="copyToClipboard(this)">📋 Copy</button>
+          <div id="layered-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Real-World Examples Section -->
+    <section id="examples" class="section fade-in">
+      <h2>💡 Real-World Applications</h2>
+      <p>See how professionals use layered prompting to tackle complex challenges across different industries.</p>
+      
+      <div class="examples-grid">
+        <div class="example-card">
+          <div class="example-title">
+            <span>💼</span> Business Strategy Analysis
+          </div>
+          <div class="layer-demo">
+            <div class="demo-layer base">
+              <div class="layer-label">Foundation</div>
+              <p>"Analyze the competitive landscape for our SaaS product"</p>
+            </div>
+            <div class="demo-layer enhancement">
+              <div class="layer-label">Enhancement</div>
+              <p>"Focus on direct competitors with similar pricing models. Include market share data, key differentiators, and customer feedback patterns from the last 18 months."</p>
+            </div>
+            <div class="demo-layer polish">
+              <div class="layer-label">Refinement</div>
+              <p>"Present as an executive briefing with clear sections: Current State, Competitive Threats, Opportunities. Include actionable recommendations. Professional tone, max 2 pages."</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-title">
+            <span>🎓</span> Educational Content Creation
+          </div>
+          <div class="layer-demo">
+            <div class="demo-layer base">
+              <div class="layer-label">Foundation</div>
+              <p>"Create a lesson plan about photosynthesis"</p>
+            </div>
+            <div class="demo-layer enhancement">
+              <div class="layer-label">Enhancement</div>
+              <p>"For 7th-grade students with varying learning styles. Include hands-on activities, visual aids, and real-world connections. Address common misconceptions."</p>
+            </div>
+            <div class="demo-layer polish">
+              <div class="layer-label">Refinement</div>
+              <p>"Structure as: Learning Objectives, Materials Needed, Step-by-Step Activities, Assessment Ideas. Engaging and age-appropriate language. Include timing for 50-minute class."</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-title">
+            <span>🛍️</span> E-commerce Product Launch
+          </div>
+          <div class="layer-demo">
+            <div class="demo-layer base">
+              <div class="layer-label">Foundation</div>
+              <p>"Develop a marketing campaign for our new smart home device"</p>
+            </div>
+            <div class="demo-layer enhancement">
+              <div class="layer-label">Enhancement</div>
+              <p>"Target tech-savvy homeowners aged 30-50. Budget: $50K. Focus on energy savings and convenience. Launch during holiday season. Address privacy concerns."</p>
+            </div>
+            <div class="demo-layer polish">
+              <div class="layer-label">Refinement</div>
+              <p>"Create timeline with pre-launch, launch, and post-launch phases. Include specific channels, messaging, budget allocation. Persuasive but trustworthy tone. Actionable format."</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="example-card">
+          <div class="example-title">
+            <span>🏥</span> Healthcare Communication
+          </div>
+          <div class="layer-demo">
+            <div class="demo-layer base">
+              <div class="layer-label">Foundation</div>
+              <p>"Explain Type 2 diabetes management to patients"</p>
+            </div>
+            <div class="demo-layer enhancement">
+              <div class="layer-label">Enhancement</div>
+              <p>"For newly diagnosed patients with high school education level. Cover diet, exercise, medication, monitoring. Address emotional aspects and common fears."</p>
+            </div>
+            <div class="demo-layer polish">
+              <div class="layer-label">Refinement</div>
+              <p>"Compassionate and encouraging tone. Use simple language, avoid medical jargon. Include practical tips and resources. Organized in easy-to-follow sections."</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Knowledge Check Quiz -->
+    <section id="quiz" class="section fade-in">
+      <div class="quiz-section">
+        <h2>🧠 Test Your Layered Prompting Mastery</h2>
+        <p>Evaluate your understanding of advanced layered prompting techniques!</p>
+        
+        <div id="quiz-container"></div>
+        
+        <div class="action-buttons">
+          <button class="btn" onclick="resetQuiz()">🔄 Retake Quiz</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Completion Section -->
+    <section class="completion-section" id="completion">
+      <h2>🎉 Outstanding Achievement!</h2>
+      <p>You've mastered advanced layered prompting! You can now construct sophisticated, multi-dimensional prompts that guide AI through complex reasoning tasks with precision and control.</p>
+      
+      <div class="action-buttons">
+        <div id="completion-actions">
+          <button class="btn" id="complete-btn" onclick="markComplete()">✅ Mark Module 6 Complete</button>
+          <button class="btn" id="restart-btn" onclick="restartModule()" style="display: none;">🔄 Study This Module Again</button>
+        </div>
+      </div>
+      
+      <div id="completion-status"></div>
+    </section>
+
+    <!-- Navigation -->
+    <div class="navigation">
+      <a href="module5.html" class="nav-link">← Previous: Context & Specificity</a>
+      <a href="module7.html" class="nav-link next">Next: Iterative Prompting →</a>
+    </div>
+
+    <!-- Home Link -->
+    <div style="text-align: center; margin: 2rem 0;">
+      <a href="index.html" class="btn secondary">🏠 Back to Home</a>
+    </div>
+  </main>
+
+  <script>
+    // Quiz data for Module 6
+    const quizData = [
+      {
+        question: "What is the primary purpose of the Foundation Layer in layered prompting?",
+        options: [
+          "To specify the output format and style",
+          "To establish the core task or primary objective",
+          "To add contextual constraints and requirements",
+          "To provide examples and templates"
+        ],
+        answer: 1,
+        explanation: "The Foundation Layer establishes the core task or primary objective - it's what you fundamentally want the AI to accomplish."
+      },
+      {
+        question: "Which layer would you use to specify that you want output 'in table format with professional tone'?",
+        options: [
+          "Foundation Layer",
+          "Enhancement Layer",
+          "Refinement Layer",
+          "Context Layer"
+        ],
+        answer: 2,
+        explanation: "The Refinement Layer handles style, tone, format, and presentation specifications that polish the final output."
+      },
+      {
+        question: "What is 'Sequential Layering' in advanced prompting strategies?",
+        options: [
+          "Adding layers in random order",
+          "Building layers that create a logical progression of reasoning",
+          "Using only one layer at a time",
+          "Repeating the same layer multiple times"
+        ],
+        answer: 1,
+        explanation: "Sequential Layering builds layers that create a logical progression of reasoning, guiding the AI through step-by-step thinking."
+      },
+      {
+        question: "When would you use 'Perspective Layering'?",
+        options: [
+          "When you want a single viewpoint analysis",
+          "When you need multiple viewpoints for comprehensive analysis",
+          "When you want to format the output",
+          "When you need to specify the audience"
+        ],
+        answer: 1,
+        explanation: "Perspective Layering adds multiple viewpoints to provide comprehensive analysis from different stakeholder perspectives."
+      },
+      {
+        question: "What makes layered prompting more effective than single-instruction prompts?",
+        options: [
+          "It's shorter and simpler",
+          "It provides granular control over every aspect of the AI's response",
+          "It works faster",
+          "It requires less thinking"
+        ],
+        answer: 1,
+        explanation: "Layered prompting provides granular control over every aspect of the AI's response, allowing for sophisticated, nuanced outputs."
+      }
+    ];
+
+    // Format templates for the builder
+    const formatTemplates = {
+      "bullet-points": "Present as clear bullet points with headers",
+      "numbered-steps": "Organize as numbered sequential steps",
+      "table": "Create in table format with clear columns",
+      "executive-summary": "Structure as an executive summary with key findings",
+      "detailed-plan": "Develop as a comprehensive action plan with timelines",
+      "presentation-outline": "Format as a presentation outline with slides"
+    };
+
+    const toneTemplates = {
+      "professional": "Use professional, formal language appropriate for business",
+      "conversational": "Write in a conversational, friendly, and approachable tone",
+      "authoritative": "Adopt an authoritative, expert tone with confidence",
+      "creative": "Use creative, inspiring language that engages and motivates",
+      "practical": "Focus on practical, action-oriented language with clear guidance"
+    };
+
+    // Initialize quiz
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+      
+      quizData.forEach((q, index) => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+        card.innerHTML = `
+          <h4>Question ${index + 1}</h4>
+          <p><strong>${q.question}</strong></p>
+          <div class="quiz-options">
+            ${q.options.map((opt, i) => `
+              <label class="quiz-option" onclick="selectOption(${index}, ${i})">
+                <input type="radio" name="q${index}" value="${i}" style="display: none;" />
+                <span>${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+          <button class="btn" onclick="checkAnswer(${index}, ${q.answer})" style="margin-top: 1rem;">Check Answer</button>
+          <div id="feedback${index}" class="feedback" style="display: none;"></div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function selectOption(questionIndex, optionIndex) {
+      const question = document.querySelectorAll('.quiz-card')[questionIndex];
+      const options = question.querySelectorAll('.quiz-option');
+      
+      options.forEach(opt => opt.classList.remove('selected'));
+      options[optionIndex].classList.add('selected');
+      
+      const radio = question.querySelector(`input[value="${optionIndex}"]`);
+      radio.checked = true;
+    }
+
+    function checkAnswer(questionIndex, correctAnswer) {
+      const question = document.querySelectorAll('.quiz-card')[questionIndex];
+      const selected = question.querySelector('input[name="q' + questionIndex + '"]:checked');
+      const feedback = document.getElementById(`feedback${questionIndex}`);
+      const options = question.querySelectorAll('.quiz-option');
+      
+      if (!selected) {
+        feedback.textContent = "⚠️ Please select an answer first.";
+        feedback.className = "feedback incorrect";
+        feedback.style.display = "block";
+        return;
+      }
+      
+      const selectedValue = parseInt(selected.value);
+      
+      // Reset all options
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+      
+      if (selectedValue === correctAnswer) {
+        options[selectedValue].classList.add('correct');
+        feedback.textContent = "✅ Correct! " + quizData[questionIndex].explanation;
+        feedback.className = "feedback correct";
+      } else {
+        options[selectedValue].classList.add('incorrect');
+        options[correctAnswer].classList.add('correct');
+        feedback.textContent = "❌ Not quite right. " + quizData[questionIndex].explanation;
+        feedback.className = "feedback incorrect";
+      }
+      
+      feedback.style.display = "block";
+    }
+
+    function resetQuiz() {
+      renderQuiz();
+    }
+
+    // Layered prompt builder functionality
+    function generateLayeredPrompt() {
+      const foundation = document.getElementById('foundation-task').value.trim();
+      const audience = document.getElementById('enhancement-audience').value.trim();
+      const requirements = document.getElementById('enhancement-requirements').value.trim();
+      const context = document.getElementById('enhancement-context').value.trim();
+      const format = document.getElementById('refinement-format').value;
+      const tone = document.getElementById('refinement-tone').value;
+      const length = document.getElementById('refinement-length').value.trim();
+      
+      if (!foundation) {
+        alert('Please enter a foundation task to build your layered prompt.');
+        return;
+      }
+      
+      let layeredPrompt = `🏗️ FOUNDATION LAYER:\n${foundation}\n\n`;
+      
+      // Enhancement layer
+      if (audience || requirements || context) {
+        layeredPrompt += `⚡ ENHANCEMENT LAYER:\n`;
+        if (audience) layeredPrompt += `Target Audience: ${audience}\n`;
+        if (requirements) layeredPrompt += `Specific Requirements: ${requirements}\n`;
+        if (context) layeredPrompt += `Context: ${context}\n`;
+        layeredPrompt += `\n`;
+      }
+      
+      // Refinement layer
+      if (format || tone || length) {
+        layeredPrompt += `🎨 REFINEMENT LAYER:\n`;
+        if (format && formatTemplates[format]) layeredPrompt += `Format: ${formatTemplates[format]}\n`;
+        if (tone && toneTemplates[tone]) layeredPrompt += `Tone: ${toneTemplates[tone]}\n`;
+        if (length) layeredPrompt += `Length/Scope: ${length}\n`;
+      }
+      
+      document.getElementById('layered-result').textContent = layeredPrompt;
+      document.getElementById('layered-output').style.display = 'block';
+      
+      // Scroll to result
+      document.getElementById('layered-output').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
+
+    function clearBuilder() {
+      document.getElementById('foundation-task').value = '';
+      document.getElementById('enhancement-audience').value = '';
+      document.getElementById('enhancement-requirements').value = '';
+      document.getElementById('enhancement-context').value = '';
+      document.getElementById('refinement-format').value = '';
+      document.getElementById('refinement-tone').value = '';
+      document.getElementById('refinement-length').value = '';
+      document.getElementById('layered-output').style.display = 'none';
+    }
+
+    // Copy functionality
+    function copyToClipboard(button) {
+      const parent = button.parentElement;
+      const textToCopy = parent.textContent.replace('📋 Copy', '').trim();
+      
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalText = button.textContent;
+        button.textContent = '✅ Copied!';
+        button.style.background = '#22c55e';
+        
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.background = '';
+        }, 2000);
+      }).catch(() => {
+        alert('Copy failed. Please try selecting and copying manually.');
+      });
+    }
+
+    // Completion functionality
+    function markComplete() {
+      localStorage.setItem('module6Complete', 'true');
+      localStorage.setItem('module6CompletedAt', new Date().toISOString());
+      const section = document.getElementById('completion');
+      const status = document.getElementById('completion-status');
+      
+      section.classList.add('completed');
+      status.innerHTML = `
+        <h3>🎉 Module 6 Complete!</h3>
+        <p>Exceptional work! You've mastered advanced layered prompting techniques. You can study this module again anytime!</p>
+        <a href="module7.html" class="btn">🚀 Continue to Module 7</a>
+      `;
+      
+      // Update completion UI
+      updateCompletionUI();
+      
+      // Update progress in home page
+      window.dispatchEvent(new Event('moduleCompleted'));
+    }
+
+    // UPDATE COMPLETION UI
+    function updateCompletionUI() {
+      const completeBtn = document.getElementById('complete-btn');
+      const restartBtn = document.getElementById('restart-btn');
+      
+      if (localStorage.getItem('module6Complete') === 'true') {
+        completeBtn.style.display = 'none';
+        restartBtn.style.display = 'inline-block';
+      } else {
+        completeBtn.style.display = 'inline-block';
+        restartBtn.style.display = 'none';
+      }
+    }
+
+    // RESTART MODULE FUNCTIONALITY
+    function restartModule() {
+      if (confirm('🔄 Are you sure you want to restart this module? This will reset your progress but keep your completion history.')) {
+        // Reset completion section
+        const section = document.getElementById('completion');
+        const status = document.getElementById('completion-status');
+        section.classList.remove('completed');
+        status.innerHTML = '';
+        
+        // Reset all quiz attempts
+        document.querySelectorAll('.quiz-question').forEach(question => {
+          question.classList.remove('answered');
+          const buttons = question.querySelectorAll('button');
+          buttons.forEach(btn => {
+            btn.classList.remove('correct', 'incorrect');
+            btn.disabled = false;
+          });
+        });
+        
+        // Reset form fields
+        document.querySelectorAll('input[type="text"], textarea').forEach(input => {
+          input.value = '';
+        });
+        
+        // Show restart notification
+        status.innerHTML = '<p>🔄 Module restarted! You can now study through the content again.</p>';
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Fade-in animation on scroll
+    function addScrollAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, {
+        threshold: 0.1
+      });
+
+      document.querySelectorAll('.fade-in').forEach(section => {
+        observer.observe(section);
+      });
+    }
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      renderQuiz();
+      addScrollAnimations();
+      
+      // Check if module is already completed
+      if (localStorage.getItem('module6Complete') === 'true') {
+        const section = document.getElementById('completion');
+        const status = document.getElementById('completion-status');
+        const completedAt = localStorage.getItem('module6CompletedAt');
+        const completedDate = completedAt ? new Date(completedAt).toLocaleDateString() : 'previously';
+        section.classList.add('completed');
+        status.innerHTML = `
+          <h3>✅ Module 6 Already Complete!</h3>
+          <p>Excellent! You completed this advanced module ${completedDate}. You can study it again anytime!</p>
+          <a href="module7.html" class="btn">🚀 Continue to Module 7</a>
+        `;
+      }
+      
+      // Update completion UI
+      updateCompletionUI();
+    });
+  </script>
+</body>
+</html>

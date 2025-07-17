@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 7: Iterative Prompting</title>
+  <link rel="stylesheet" href="module7.css" />
+</head>
+<body>
+  <header class="module-header">
+    <h1>🔄 Module 7: Iterative Prompting and Output Evaluation</h1>
+    <p class="subtitle">Refine your prompts based on AI responses. Learn to adapt, clarify, and improve.</p>
+  </header>
+
+  <nav class="progress-bar">
+    <div class="step active">Initial Prompt</div>
+    <div class="step">AI Response</div>
+    <div class="step">Refinement Strategy</div>
+    <div class="step">Final Prompt</div>
+  </nav>
+
+  <!-- === WHAT IS ITERATIVE PROMPTING SECTION === -->
+  <section class="module-content">
+    <h2>🎯 What is Iterative Prompting?</h2>
+    <div class="concept-explanation">
+      <p class="lead-text">
+        <strong>Iterative prompting</strong> is the process of continuously refining and improving your prompts based on the AI's responses. Instead of expecting perfect results from your first attempt, you analyze the output and systematically enhance your prompt to get better, more accurate, and more useful responses.
+      </p>
+      
+      <div class="concept-highlights">
+        <div class="highlight-card">
+          <div class="highlight-icon">�</div>
+          <div class="highlight-content">
+            <h4>Continuous Improvement</h4>
+            <p>Each iteration builds upon the previous one, creating a cycle of enhancement that leads to progressively better results.</p>
+          </div>
+        </div>
+        
+        <div class="highlight-card">
+          <div class="highlight-icon">🎯</div>
+          <div class="highlight-content">
+            <h4>Goal-Oriented</h4>
+            <p>Every refinement is driven by a specific goal: clearer explanations, better format, appropriate tone, or more relevant examples.</p>
+          </div>
+        </div>
+        
+        <div class="highlight-card">
+          <div class="highlight-icon">📊</div>
+          <div class="highlight-content">
+            <h4>Evidence-Based</h4>
+            <p>Refinements are based on actual AI responses, not assumptions, ensuring each change addresses real output issues.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === KEY ASPECTS SECTION === -->
+  <section class="module-content">
+    <h2>🔑 Key Aspects of Iterative Prompting</h2>
+    
+    <div class="aspects-grid">
+      <div class="aspect-card">
+        <div class="aspect-number">1</div>
+        <div class="aspect-content">
+          <h4>🎯 Clear Objectives</h4>
+          <p>Define what you want to achieve before starting. Are you looking for:</p>
+          <ul>
+            <li>Comprehensive explanations</li>
+            <li>Step-by-step instructions</li>
+            <li>Creative ideas</li>
+            <li>Specific formats (lists, tables, code)</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="aspect-card">
+        <div class="aspect-number">2</div>
+        <div class="aspect-content">
+          <h4>🔍 Response Analysis</h4>
+          <p>Critically evaluate AI responses for:</p>
+          <ul>
+            <li><strong>Accuracy:</strong> Is the information correct?</li>
+            <li><strong>Completeness:</strong> Are important details missing?</li>
+            <li><strong>Clarity:</strong> Is it easy to understand?</li>
+            <li><strong>Relevance:</strong> Does it address your actual need?</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="aspect-card">
+        <div class="aspect-number">3</div>
+        <div class="aspect-content">
+          <h4>�🛠️ Strategic Refinement</h4>
+          <p>Apply specific refinement strategies:</p>
+          <ul>
+            <li><strong>Specificity:</strong> Add context and constraints</li>
+            <li><strong>Examples:</strong> Provide sample inputs/outputs</li>
+            <li><strong>Format:</strong> Specify structure and style</li>
+            <li><strong>Audience:</strong> Define the target reader</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="aspect-card">
+        <div class="aspect-number">4</div>
+        <div class="aspect-content">
+          <h4>📈 Progressive Enhancement</h4>
+          <p>Build upon each iteration:</p>
+          <ul>
+            <li>Keep what works well</li>
+            <li>Address one issue at a time</li>
+            <li>Test different approaches</li>
+            <li>Document successful patterns</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === OUTPUT EVALUATION SECTION === -->
+  <section class="module-content">
+    <h2>📊 What is Output Evaluation?</h2>
+    
+    <div class="evaluation-explanation">
+      <p class="lead-text">
+        <strong>Output evaluation</strong> is the systematic process of analyzing AI responses to determine their quality, usefulness, and alignment with your goals. It's the foundation of effective iterative prompting, as it tells you what to improve in your next iteration.
+      </p>
+      
+      <div class="evaluation-framework">
+        <h3>🎯 The CLEAR Evaluation Framework</h3>
+        <div class="framework-grid">
+          <div class="framework-item">
+            <div class="framework-letter">C</div>
+            <div class="framework-details">
+              <h4>Completeness</h4>
+              <p>Does the response address all aspects of your question? Are there gaps or missing information?</p>
+            </div>
+          </div>
+          
+          <div class="framework-item">
+            <div class="framework-letter">L</div>
+            <div class="framework-details">
+              <h4>Length</h4>
+              <p>Is the response the right length? Too brief and lacking detail, or too verbose and overwhelming?</p>
+            </div>
+          </div>
+          
+          <div class="framework-item">
+            <div class="framework-letter">E</div>
+            <div class="framework-details">
+              <h4>Examples</h4>
+              <p>Are there sufficient, relevant examples? Do they help illustrate the concepts effectively?</p>
+            </div>
+          </div>
+          
+          <div class="framework-item">
+            <div class="framework-letter">A</div>
+            <div class="framework-details">
+              <h4>Accuracy</h4>
+              <p>Is the information factually correct? Are there any errors or misleading statements?</p>
+            </div>
+          </div>
+          
+          <div class="framework-item">
+            <div class="framework-letter">R</div>
+            <div class="framework-details">
+              <h4>Relevance</h4>
+              <p>Does the response directly address your needs? Is it appropriate for your context and audience?</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === EVALUATION STEPS SECTION === -->
+  <section class="module-content">
+    <h2>📋 Typical Output Evaluation Steps</h2>
+    
+    <div class="steps-container">
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>🎯 Initial Review</h4>
+          <p><strong>First impression check:</strong></p>
+          <ul>
+            <li>Does this answer my question?</li>
+            <li>Is the overall direction correct?</li>
+            <li>What stands out as particularly good or problematic?</li>
+          </ul>
+          <div class="step-example">
+            <strong>Example:</strong> "The AI explained machine learning but focused on theory when I needed practical implementation steps."
+          </div>
+        </div>
+      </div>
+      
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>🔍 Detailed Analysis</h4>
+          <p><strong>Systematic quality assessment:</strong></p>
+          <ul>
+            <li><strong>Content Quality:</strong> Accuracy, depth, and currency</li>
+            <li><strong>Structure:</strong> Logical flow and organization</li>
+            <li><strong>Clarity:</strong> Language, terminology, and explanations</li>
+            <li><strong>Completeness:</strong> Missing elements or gaps</li>
+          </ul>
+          <div class="step-example">
+            <strong>Example:</strong> "Good technical accuracy but lacks beginner-friendly examples and has too much jargon."
+          </div>
+        </div>
+      </div>
+      
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>🎭 Audience Fit</h4>
+          <p><strong>Contextual appropriateness:</strong></p>
+          <ul>
+            <li>Is the tone suitable for the intended audience?</li>
+            <li>Are the examples relevant to the user's context?</li>
+            <li>Is the complexity level appropriate?</li>
+            <li>Does it match the expected use case?</li>
+          </ul>
+          <div class="step-example">
+            <strong>Example:</strong> "The response is too technical for a business audience - needs more practical benefits and less code."
+          </div>
+        </div>
+      </div>
+      
+      <div class="step-item">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>📐 Format & Structure</h4>
+          <p><strong>Presentation evaluation:</strong></p>
+          <ul>
+            <li>Is the format appropriate for the content?</li>
+            <li>Are headings, lists, and sections used effectively?</li>
+            <li>Is it easy to scan and find key information?</li>
+            <li>Would a different format be more useful?</li>
+          </ul>
+          <div class="step-example">
+            <strong>Example:</strong> "The information is good but would be much clearer as a numbered list rather than paragraph form."
+          </div>
+        </div>
+      </div>
+      
+      <div class="step-item">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <h4>📝 Refinement Planning</h4>
+          <p><strong>Strategic next steps:</strong></p>
+          <ul>
+            <li>Prioritize the most important issues to address</li>
+            <li>Choose specific refinement strategies</li>
+            <li>Plan the next iteration's improvements</li>
+            <li>Consider alternative approaches if needed</li>
+          </ul>
+          <div class="step-example">
+            <strong>Example:</strong> "Next iteration: Add 'explain like I'm 5' and request bullet points with real-world examples."
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === PRACTICAL EXAMPLES SECTION === -->
+  <section class="module-content">
+    <h2>💡 Real-World Iterative Prompting Examples</h2>
+    
+    <div class="examples-container">
+      <div class="example-scenario">
+        <h3>🎯 Scenario: Learning About Cryptocurrency</h3>
+        
+        <div class="iteration-example">
+          <div class="iteration-header">
+            <span class="iteration-badge">Iteration 1</span>
+            <span class="iteration-status status-poor">Poor Result</span>
+          </div>
+          <div class="iteration-content">
+            <div class="prompt-section">
+              <h4>Initial Prompt:</h4>
+              <p class="prompt-text">"Tell me about cryptocurrency."</p>
+            </div>
+            <div class="response-section">
+              <h4>AI Response Issues:</h4>
+              <ul>
+                <li>Too broad and overwhelming</li>
+                <li>Heavy technical jargon</li>
+                <li>No practical examples</li>
+                <li>Doesn't address user's actual need</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="iteration-example">
+          <div class="iteration-header">
+            <span class="iteration-badge">Iteration 2</span>
+            <span class="iteration-status status-better">Better Result</span>
+          </div>
+          <div class="iteration-content">
+            <div class="prompt-section">
+              <h4>Refined Prompt:</h4>
+              <p class="prompt-text">"Explain cryptocurrency to a complete beginner who wants to understand the basics before potentially investing. Use simple language and include practical examples."</p>
+            </div>
+            <div class="response-section">
+              <h4>Improvements:</h4>
+              <ul>
+                <li>Clearer target audience</li>
+                <li>Specific use case (investment)</li>
+                <li>Requested simple language</li>
+                <li>Asked for practical examples</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="iteration-example">
+          <div class="iteration-header">
+            <span class="iteration-badge">Iteration 3</span>
+            <span class="iteration-status status-excellent">Excellent Result</span>
+          </div>
+          <div class="iteration-content">
+            <div class="prompt-section">
+              <h4>Final Refined Prompt:</h4>
+              <p class="prompt-text">"Explain cryptocurrency to a complete beginner in 3 sections: 1) What it is (like explaining to a 12-year-old), 2) How it works (simple analogy), 3) What beginners should know before investing (5 key points). Use bullet points and avoid technical jargon."</p>
+            </div>
+            <div class="response-section">
+              <h4>Perfect Additions:</h4>
+              <ul>
+                <li>Specific structure (3 sections)</li>
+                <li>Format requirements (bullet points)</li>
+                <li>Clarity level (12-year-old)</li>
+                <li>Practical focus (investment tips)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === INTERACTIVE PRACTICE SECTION === -->
+  <section class="module-content">
+    <h2>🛠️ Interactive Prompt Refinement Practice</h2>
+    
+    <div class="practice-intro">
+      <p>Now it's your turn! Use the tool below to practice iterative prompting. Start with a basic prompt, analyze the response, and refine it step by step.</p>
+    </div>
+    
+    <label for="initial">Initial Prompt:</label>
+    <input type="text" id="initial" placeholder="e.g., Explain quantum computing" />
+
+    <label for="response">AI Response (sample or pasted):</label>
+    <textarea id="response" rows="5" placeholder="Paste or simulate AI response here..."></textarea>
+
+    <label for="strategy">Refinement Strategy:</label>
+    <select id="strategy">
+      <option value="clarify">Clarify vague parts</option>
+      <option value="shorten">Shorten response</option>
+      <option value="tone">Adjust tone</option>
+      <option value="format">Reformat output</option>
+    </select>
+
+    <button onclick="refinePrompt()">Generate Refined Prompt</button>
+
+    <div id="refined-output" class="output-preview"></div>
+  </section>
+
+  <section class="quiz-card">
+    <h2>🧪 Quiz: Refinement Tactics</h2>
+    <p>Which strategy would improve a response that’s too long and rambling?</p>
+    <ul>
+      <li><button onclick="showQuizFeedback(this)">Clarify vague parts</button></li>
+      <li><button onclick="showQuizFeedback(this)">Shorten response</button></li>
+      <li><button onclick="showQuizFeedback(this)">Adjust tone</button></li>
+    </ul>
+    <p id="quiz-feedback" class="feedback"></p>
+  </section>
+
+  <section class="cheat-sheet" id="cheat-sheet">
+    <h2>📘 Iterative Prompting Cheat Sheet</h2>
+    <p>💡 Common refinement strategies:</p>
+    <ul>
+      <li>🔍 Ask for examples</li>
+      <li>🎯 Specify tone or audience</li>
+      <li>📏 Limit response length</li>
+      <li>📐 Request structured format</li>
+    </ul>
+    <a href="iterative_prompting.pdf" download class="cta-button">📄 Download Cheat Sheet</a>
+  </section>
+
+  <footer class="module-footer">
+    <div id="completion-actions">
+      <button class="cta-button" id="complete-btn" onclick="markComplete()">✅ Mark Module 7 Complete</button>
+      <button class="cta-button" id="restart-btn" onclick="restartModule()" style="display: none;">🔄 Study Again</button>
+    </div>
+    <a href="index.html" class="cta-button">← Back to Home</a>
+  </footer>
+
+  <!-- 🌗 Enhanced JavaScript for World-Class Functionality -->
+  <script>
+    // ================================
+    // INITIALIZATION & DARK MODE
+    // ================================
+    
+    // Initialize dark mode
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark-mode');
+    }
+
+    // Initialize progress tracking
+    let currentStep = 0;
+    const steps = document.querySelectorAll('.step');
+    let promptHistory = [];
+    let refinementCount = 0;
+
+    // Add entrance animations when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Animate cards in sequence
+      const cards = document.querySelectorAll('.module-content, .quiz-card, .cheat-sheet');
+      cards.forEach((card, index) => {
+        setTimeout(() => {
+          card.classList.add('slide-in');
+        }, index * 200);
+      });
+
+      // Initialize progress bar
+      updateProgressBar();
+      
+      // Load previous session data
+      loadSessionData();
+      
+      // Update completion UI based on current status
+      updateCompletionUI();
+      
+      // Show completion status if already completed
+      if (localStorage.getItem('module7Complete') === 'true') {
+        const completedAt = localStorage.getItem('module7CompletedAt');
+        const completedDate = completedAt ? new Date(completedAt).toLocaleDateString() : 'previously';
+        showNotification(`✅ You completed this module ${completedDate}. You can study it again anytime!`, 'info');
+      }
+    });
+
+    // ================================
+    // PROGRESS BAR MANAGEMENT
+    // ================================
+    
+    function updateProgressBar() {
+      steps.forEach((step, index) => {
+        step.classList.remove('active', 'completed');
+        if (index < currentStep) {
+          step.classList.add('completed');
+        } else if (index === currentStep) {
+          step.classList.add('active');
+        }
+      });
+    }
+
+    function advanceProgress() {
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        updateProgressBar();
+        
+        // Add celebration animation for completion
+        if (currentStep === steps.length - 1) {
+          setTimeout(() => {
+            showCelebration('🎉 Prompt refinement process complete!');
+          }, 500);
+        }
+      }
+    }
+
+    // ================================
+    // ENHANCED PROMPT REFINEMENT
+    // ================================
+    
+    function refinePrompt() {
+      const initial = document.getElementById('initial').value.trim();
+      const strategy = document.getElementById('strategy').value;
+      const response = document.getElementById('response').value.trim();
+      
+      if (!initial) {
+        showNotification('⚠️ Please enter an initial prompt first.', 'warning');
+        return;
+      }
+
+      let refined = '';
+      let explanation = '';
+
+      // Advanced refinement strategies with context awareness
+      switch (strategy) {
+        case 'clarify':
+          refined = `${initial}\n\nPlease provide specific examples and clarify any technical terms or ambiguous concepts in your response.`;
+          explanation = '🔍 Added clarity requirements for better understanding';
+          break;
+          
+        case 'shorten':
+          refined = `${initial}\n\nProvide a concise response in 3-5 sentences maximum, focusing on the most essential information.`;
+          explanation = '✂️ Requested concise format to reduce verbosity';
+          break;
+          
+        case 'tone':
+          refined = `${initial}\n\nPlease respond in a friendly, conversational tone suitable for beginners, avoiding jargon where possible.`;
+          explanation = '🎭 Adjusted tone for better audience connection';
+          break;
+          
+        case 'format':
+          refined = `${initial}\n\nStructure your response as:\n1. Brief overview\n2. Key points in bullet format\n3. Practical example\n4. Summary`;
+          explanation = '📐 Added structured format for better organization';
+          break;
+      }
+
+      // Display refined prompt with animation
+      const outputElement = document.getElementById('refined-output');
+      outputElement.innerHTML = `
+        <div class="refinement-result">
+          <div class="strategy-badge">${explanation}</div>
+          <div class="refined-text">${refined}</div>
+          <div class="refinement-actions">
+            <button onclick="copyToClipboard('${refined.replace(/'/g, "\\'")}')">📋 Copy Prompt</button>
+            <button onclick="saveRefinement()">💾 Save</button>
+            <button onclick="newIteration()">🔄 New Iteration</button>
+          </div>
+        </div>
+      `;
+
+      // Store in history
+      promptHistory.push({
+        original: initial,
+        strategy: strategy,
+        refined: refined,
+        timestamp: new Date().toLocaleString()
+      });
+
+      refinementCount++;
+      
+      // Advance progress
+      if (currentStep < 2) {
+        advanceProgress();
+      }
+
+      // Show success notification
+      showNotification('✅ Prompt refined successfully!', 'success');
+      
+      // Auto-save session
+      saveSessionData();
+    }
+
+    // ================================
+    // UTILITY FUNCTIONS
+    // ================================
+    
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showNotification('📋 Copied to clipboard!', 'success');
+      }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showNotification('📋 Copied to clipboard!', 'success');
+      });
+    }
+
+    function saveRefinement() {
+      const savedRefinements = JSON.parse(localStorage.getItem('savedRefinements') || '[]');
+      savedRefinements.push(promptHistory[promptHistory.length - 1]);
+      localStorage.setItem('savedRefinements', JSON.stringify(savedRefinements));
+      showNotification('💾 Refinement saved!', 'success');
+    }
+
+    function newIteration() {
+      const lastRefinement = promptHistory[promptHistory.length - 1];
+      if (lastRefinement) {
+        document.getElementById('initial').value = lastRefinement.refined;
+        document.getElementById('response').value = '';
+        document.getElementById('refined-output').innerHTML = '';
+        showNotification('🔄 Ready for next iteration!', 'info');
+      }
+    }
+
+    function showNotification(message, type = 'info') {
+      // Remove existing notifications
+      const existing = document.querySelector('.notification');
+      if (existing) existing.remove();
+
+      // Create notification
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      notification.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()">×</button>
+      `;
+      
+      // Add to page
+      document.body.appendChild(notification);
+      
+      // Auto-remove after 4 seconds
+      setTimeout(() => {
+        if (notification.parentElement) {
+          notification.classList.add('fade-out');
+          setTimeout(() => notification.remove(), 300);
+        }
+      }, 4000);
+    }
+
+    function showCelebration(message) {
+      const celebration = document.createElement('div');
+      celebration.className = 'celebration';
+      celebration.innerHTML = `
+        <div class="celebration-content">
+          <div class="celebration-icon">🎉</div>
+          <div class="celebration-message">${message}</div>
+        </div>
+      `;
+      document.body.appendChild(celebration);
+      
+      setTimeout(() => {
+        celebration.classList.add('fade-out');
+        setTimeout(() => celebration.remove(), 500);
+      }, 3000);
+    }
+
+    // ================================
+    // ENHANCED QUIZ FUNCTIONALITY
+    // ================================
+    
+    function showQuizFeedback(btn) {
+      // Remove previous selections
+      document.querySelectorAll('.quiz-card button').forEach(b => {
+        b.classList.remove('selected', 'correct', 'incorrect');
+      });
+
+      const isCorrect = btn.textContent.includes('Shorten');
+      const feedbackElement = document.getElementById('quiz-feedback');
+      
+      btn.classList.add('selected', isCorrect ? 'correct' : 'incorrect');
+      
+      if (isCorrect) {
+        feedbackElement.innerHTML = `
+          <div class="feedback-content correct">
+            ✅ <strong>Excellent!</strong> Shortening helps manage verbosity and improves clarity.
+            <div class="feedback-tip">💡 Tip: Always specify desired length when responses are too long.</div>
+          </div>
+        `;
+        
+        // Award points and advance progress
+        if (currentStep < 3) {
+          setTimeout(advanceProgress, 1000);
+        }
+      } else {
+        feedbackElement.innerHTML = `
+          <div class="feedback-content incorrect">
+            ❌ <strong>Not quite.</strong> Think about what would help with a "long and rambling" response.
+            <div class="feedback-hint">💭 Hint: The issue is about length, not clarity or tone.</div>
+          </div>
+        `;
+      }
+
+      // Add animation class
+      feedbackElement.classList.add('bounce-in');
+      setTimeout(() => feedbackElement.classList.remove('bounce-in'), 600);
+    }
+
+    // ================================
+    // SESSION MANAGEMENT
+    // ================================
+    
+    function saveSessionData() {
+      const sessionData = {
+        currentStep,
+        promptHistory,
+        refinementCount,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('module7Session', JSON.stringify(sessionData));
+    }
+
+    function loadSessionData() {
+      const sessionData = JSON.parse(localStorage.getItem('module7Session') || '{}');
+      if (sessionData.timestamp && Date.now() - sessionData.timestamp < 24 * 60 * 60 * 1000) { // 24 hours
+        currentStep = sessionData.currentStep || 0;
+        promptHistory = sessionData.promptHistory || [];
+        refinementCount = sessionData.refinementCount || 0;
+        updateProgressBar();
+        
+        if (promptHistory.length > 0) {
+          showNotification('📚 Previous session restored!', 'info');
+        }
+      }
+    }
+
+    function resetSession() {
+      localStorage.removeItem('module7Session');
+      currentStep = 0;
+      promptHistory = [];
+      refinementCount = 0;
+      updateProgressBar();
+      document.getElementById('initial').value = '';
+      document.getElementById('response').value = '';
+      document.getElementById('refined-output').innerHTML = '';
+      document.getElementById('quiz-feedback').innerHTML = '';
+      showNotification('🔄 Session reset successfully!', 'success');
+    }
+
+    // ================================
+    // MODULE COMPLETION
+    // ================================
+    
+    function markComplete() {
+      if (refinementCount < 1) {
+        showNotification('⚠️ Please try the prompt refinement tool first!', 'warning');
+        return;
+      }
+
+      // Mark module as complete
+      localStorage.setItem('module7Complete', 'true');
+      
+      // Update completion timestamp
+      localStorage.setItem('module7CompletedAt', new Date().toISOString());
+      
+      // Show completion celebration
+      showCelebration('🎉 Congratulations! Module 7 Complete!');
+      
+      // Update UI to show restart option
+      updateCompletionUI();
+      
+      // Show completion stats
+      setTimeout(() => {
+        const stats = `
+          📊 <strong>Your Progress:</strong><br>
+          • Refinements made: ${refinementCount}<br>
+          • Prompts in history: ${promptHistory.length}<br>
+          • Module completed: ${new Date().toLocaleDateString()}<br><br>
+          🚀 You've mastered iterative prompting!
+        `;
+        showNotification(stats, 'success');
+      }, 2000);
+
+      // Confetti effect
+      createConfetti();
+    }
+
+    function createConfetti() {
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.animationDelay = Math.random() * 3 + 's';
+        confetti.style.backgroundColor = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#43e97b'][Math.floor(Math.random() * 5)];
+        document.body.appendChild(confetti);
+        
+        setTimeout(() => confetti.remove(), 3000);
+      }
+    }
+
+    // UPDATE COMPLETION UI
+    // ================================
+    
+    function updateCompletionUI() {
+      const completeBtn = document.getElementById('complete-btn');
+      const restartBtn = document.getElementById('restart-btn');
+      
+      if (localStorage.getItem('module7Complete') === 'true') {
+        completeBtn.style.display = 'none';
+        restartBtn.style.display = 'inline-flex';
+        restartBtn.innerHTML = '🔄 Study This Module Again';
+      } else {
+        completeBtn.style.display = 'inline-flex';
+        restartBtn.style.display = 'none';
+      }
+    }
+
+    // RESTART MODULE FUNCTIONALITY
+    // ================================
+    
+    function restartModule() {
+      // Show confirmation dialog
+      if (confirm('🔄 Are you sure you want to restart this module? This will reset your progress but keep your completion history.')) {
+        // Reset module-specific data (but keep completion history)
+        refinementCount = 0;
+        promptHistory = [];
+        
+        // Clear input fields
+        document.getElementById('prompt').value = '';
+        document.getElementById('output').innerHTML = '';
+        
+        // Clear progress indicators
+        document.querySelectorAll('.step').forEach(step => {
+          step.classList.remove('active', 'completed');
+        });
+        document.querySelector('.step').classList.add('active');
+        
+        // Reset any quiz or interactive elements
+        document.querySelectorAll('.quiz-card .feedback').forEach(feedback => {
+          feedback.innerHTML = '';
+        });
+        
+        // Show restart notification
+        showNotification('🔄 Module restarted! You can now study through the content again.', 'info');
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Note: We DON'T remove the completion flag, so users can see they've completed it before
+        // This maintains their achievement history while allowing re-study
+      }
+    }
+
+    // ================================
+    // KEYBOARD SHORTCUTS
+    // ================================
+    
+    document.addEventListener('keydown', function(e) {
+      // Ctrl/Cmd + Enter to refine prompt
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        refinePrompt();
+      }
+      
+      // Ctrl/Cmd + R to reset (prevent default browser refresh)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+        e.preventDefault();
+        resetSession();
+      }
+    });
+
+    // ================================
+    // ANALYTICS & TRACKING
+    // ================================
+    
+    function trackInteraction(action, details = {}) {
+      const interaction = {
+        action,
+        details,
+        timestamp: Date.now(),
+        module: 'module7'
+      };
+      
+      const interactions = JSON.parse(localStorage.getItem('learningAnalytics') || '[]');
+      interactions.push(interaction);
+      localStorage.setItem('learningAnalytics', JSON.stringify(interactions));
+    }
+
+    // Track key interactions
+    document.getElementById('initial').addEventListener('input', () => trackInteraction('prompt_input'));
+    document.getElementById('strategy').addEventListener('change', () => trackInteraction('strategy_select'));
+  </script>
+
+  <!-- Enhanced CSS for JavaScript functionality -->
+  <style>
+    /* Notification styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      max-width: 350px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: slideInRight 0.3s ease;
+      border-left: 4px solid var(--accent-gradient);
+    }
+
+    .notification-success { border-left-color: #43e97b; }
+    .notification-warning { border-left-color: #fa709a; }
+    .notification-info { border-left-color: #4facfe; }
+
+    .notification button {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 1rem;
+      color: var(--text-light);
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .fade-out {
+      animation: fadeOut 0.3s ease forwards;
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateX(100%); }
+    }
+
+    /* Celebration styles */
+    .celebration {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .celebration-content {
+      text-align: center;
+      color: white;
+      font-size: 2rem;
+      animation: bounceIn 0.6s ease;
+    }
+
+    .celebration-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-30px); }
+      60% { transform: translateY(-15px); }
+    }
+
+    /* Refinement result styles */
+    .refinement-result {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      border: 2px solid var(--border-color);
+      margin-top: var(--spacing-lg);
+    }
+
+    .strategy-badge {
+      background: var(--accent-gradient);
+      color: white;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .refined-text {
+      background: var(--bg-secondary);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-md);
+      font-family: 'Monaco', 'Menlo', monospace;
+      line-height: 1.6;
+      margin: var(--spacing-sm) 0;
+      white-space: pre-wrap;
+    }
+
+    .refinement-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-md);
+      flex-wrap: wrap;
+    }
+
+    .refinement-actions button {
+      font-size: 0.9rem;
+      padding: var(--spacing-sm) var(--spacing-md);
+      margin: 0;
+    }
+
+    /* Quiz feedback enhancements */
+    .feedback-content {
+      padding: var(--spacing-md);
+      border-radius: var(--radius-md);
+      margin-top: var(--spacing-sm);
+    }
+
+    .feedback-content.correct {
+      background: var(--success-gradient);
+      color: white;
+    }
+
+    .feedback-content.incorrect {
+      background: var(--warning-gradient);
+      color: white;
+    }
+
+    .feedback-tip, .feedback-hint {
+      margin-top: var(--spacing-sm);
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .quiz-card button.selected {
+      transform: translateX(8px) scale(1.02);
+    }
+
+    .quiz-card button.correct {
+      background: var(--success-gradient) !important;
+      color: white !important;
+    }
+
+    .quiz-card button.incorrect {
+      background: var(--warning-gradient) !important;
+      color: white !important;
+    }
+
+    /* Confetti animation */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: #667eea;
+      top: -10px;
+      z-index: 1500;
+      animation: confettiFall 3s linear forwards;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</body>
+</html>

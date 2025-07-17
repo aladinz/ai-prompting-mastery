@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Module 4: Refining Your AI Outputs</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Custom styling for Module 4 */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .module-header {
+      background: linear-gradient(135deg, var(--accent, #4a47a3), #6c63ff);
+      color: white;
+      padding: 4rem 1rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .module-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .module-header h1 {
+      font-size: 3rem;
+      margin: 0 0 1rem 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .subtitle {
+      font-size: 1.3rem;
+      margin: 0;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress-wrapper {
+      background: var(--card, #ffffff);
+      border-bottom: 1px solid var(--border, #e0e0e0);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .progress-bar {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .step {
+      padding: 0.7rem 1.2rem;
+      border-radius: 25px;
+      background: var(--light-bg, #f0f0f0);
+      color: var(--text, #666);
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .step.active {
+      background: var(--accent, #4a47a3);
+      color: white;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(74, 71, 163, 0.3);
+    }
+
+    .step.completed {
+      background: var(--success, #22c55e);
+      color: white;
+      border-color: var(--success, #22c55e);
+    }
+
+    .module-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 1rem;
+      line-height: 1.7;
+    }
+
+    .table-of-contents {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0 3rem 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .table-of-contents h3 {
+      margin: 0 0 1.5rem 0;
+      color: var(--accent, #4a47a3);
+      font-size: 1.4rem;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .toc-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .toc-list li {
+      background: var(--light-bg, #f8f9fa);
+      border-radius: 8px;
+      padding: 1rem;
+      transition: all 0.3s ease;
+      border-left: 4px solid var(--accent, #4a47a3);
+    }
+
+    .toc-list li:hover {
+      transform: translateX(5px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .toc-list a {
+      text-decoration: none;
+      color: var(--text, #333);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section {
+      margin: 4rem 0;
+      scroll-margin-top: 100px;
+    }
+
+    .section h2 {
+      color: var(--accent, #4a47a3);
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border, #e0e0e0);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .strategy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .strategy-card {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .strategy-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent, #4a47a3), #6c63ff);
+    }
+
+    .strategy-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .strategy-card .icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .strategy-card h3 {
+      color: var(--accent, #4a47a3);
+      margin-bottom: 1rem;
+    }
+
+    .before-after-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .response-card {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .response-card.before {
+      border-left: 4px solid #ef4444;
+    }
+
+    .response-card.before::before {
+      content: '❌ Before';
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: #ef4444;
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .response-card.after {
+      border-left: 4px solid #22c55e;
+    }
+
+    .response-card.after::before {
+      content: '✅ After';
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: #22c55e;
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .response-text {
+      background: var(--light-bg, #f8f9fa);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      font-style: italic;
+      border-left: 3px solid var(--accent, #4a47a3);
+    }
+
+    .follow-up-prompt {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .follow-up-prompt::before {
+      content: '🔄 Follow-up: ';
+      font-weight: 600;
+    }
+
+    .interactive-refiner {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 3rem 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .refiner-step {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: var(--light-bg, #f8f9fa);
+      border-radius: 8px;
+      border-left: 4px solid var(--accent, #4a47a3);
+    }
+
+    .refiner-step h4 {
+      margin: 0 0 1rem 0;
+      color: var(--accent, #4a47a3);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: var(--text, #333);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      padding: 1rem;
+      border: 2px solid var(--border, #e0e0e0);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: var(--card, #ffffff);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent, #4a47a3);
+      box-shadow: 0 0 0 3px rgba(74, 71, 163, 0.1);
+    }
+
+    .output-display {
+      background: var(--light-bg, #f8f9fa);
+      border: 2px solid var(--accent, #4a47a3);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      min-height: 100px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 1rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      position: relative;
+    }
+
+    .copy-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--accent, #4a47a3);
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.3s ease;
+    }
+
+    .copy-button:hover {
+      background: var(--accent-dark, #373451);
+      transform: scale(1.05);
+    }
+
+    .techniques-showcase {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .technique-example {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .technique-example:hover {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      transform: translateY(-3px);
+    }
+
+    .technique-title {
+      background: linear-gradient(135deg, var(--accent, #4a47a3), #6c63ff);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 25px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .prompt-sequence {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .prompt-step {
+      padding: 1rem;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .prompt-step.initial {
+      background: #e0f2fe;
+      border-left: 4px solid #0284c7;
+    }
+
+    .prompt-step.followup {
+      background: #f0f9ff;
+      border-left: 4px solid #6366f1;
+    }
+
+    .prompt-step.result {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+    }
+
+    .step-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--accent, #4a47a3);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .quiz-section {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 3rem 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .quiz-card {
+      background: var(--light-bg, #f8f9fa);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 1.5rem 0;
+      transition: all 0.3s ease;
+    }
+
+    .quiz-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .quiz-options {
+      display: grid;
+      gap: 0.8rem;
+      margin: 1.5rem 0;
+    }
+
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1rem;
+      background: var(--card, #ffffff);
+      border: 2px solid var(--border, #e0e0e0);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--accent, #4a47a3);
+      background: var(--accent-light, #f0f0ff);
+    }
+
+    .quiz-option.selected {
+      border-color: var(--accent, #4a47a3);
+      background: var(--accent-light, #f0f0ff);
+    }
+
+    .quiz-option.correct {
+      border-color: var(--success, #22c55e);
+      background: var(--success-light, #f0fdf4);
+    }
+
+    .quiz-option.incorrect {
+      border-color: var(--error, #ef4444);
+      background: var(--error-light, #fef2f2);
+    }
+
+    .feedback {
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .feedback.correct {
+      background: var(--success-light, #f0fdf4);
+      color: var(--success-dark, #15803d);
+      border-left: 4px solid var(--success, #22c55e);
+    }
+
+    .feedback.incorrect {
+      background: var(--error-light, #fef2f2);
+      color: var(--error-dark, #dc2626);
+      border-left: 4px solid var(--error, #ef4444);
+    }
+
+    .completion-section {
+      background: var(--card, #ffffff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      margin: 4rem 0;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .completion-section.completed {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      border: none;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+    }
+
+    .btn {
+      background: var(--accent, #4a47a3);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(74, 71, 163, 0.3);
+    }
+
+    .btn.secondary {
+      background: var(--card, #ffffff);
+      color: var(--accent, #4a47a3);
+      border: 2px solid var(--accent, #4a47a3);
+    }
+
+    .btn.secondary:hover {
+      background: var(--accent, #4a47a3);
+      color: white;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 4rem 0 2rem 0;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border, #e0e0e0);
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent, #4a47a3);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      transform: translateX(-5px);
+    }
+
+    .nav-link.next:hover {
+      transform: translateX(5px);
+    }
+
+    /* Animation for fade-in effect */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .module-header h1 {
+        font-size: 2.2rem;
+      }
+
+      .subtitle {
+        font-size: 1.1rem;
+      }
+
+      .progress-bar {
+        gap: 0.5rem;
+      }
+
+      .step {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+      }
+
+      .module-content {
+        padding: 2rem 1rem;
+      }
+
+      .section h2 {
+        font-size: 1.6rem;
+      }
+
+      .strategy-grid,
+      .techniques-showcase {
+        grid-template-columns: 1fr;
+      }
+
+      .before-after-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .navigation {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+
+    /* Dark Mode Support */
+    .dark-mode .module-header {
+      background: linear-gradient(135deg, var(--accent-dark, #2d2a6c), #1e1b4f);
+    }
+
+    .dark-mode .progress-wrapper {
+      background: var(--card-dark, #1a1a1a);
+      border-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .step {
+      background: var(--light-bg-dark, #333);
+      color: var(--text-dark, #ccc);
+    }
+
+    .dark-mode .table-of-contents {
+      background: var(--card-dark, #1e1e1e);
+      border-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .table-of-contents h3 {
+      color: var(--accent-dark, #6366f1);
+    }
+
+    .dark-mode .toc-list li {
+      background: var(--light-bg-dark, #2a2a2a);
+      border-left-color: var(--accent-dark, #6366f1);
+    }
+
+    .dark-mode .toc-list a {
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .section h2 {
+      color: var(--accent-dark, #6366f1);
+      border-bottom-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .strategy-card,
+    .dark-mode .response-card,
+    .dark-mode .interactive-refiner,
+    .dark-mode .technique-example,
+    .dark-mode .quiz-section,
+    .dark-mode .quiz-card,
+    .dark-mode .completion-section {
+      background: var(--card-dark, #1e1e1e);
+      border-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .strategy-card::before {
+      background: linear-gradient(90deg, var(--accent-dark, #6366f1), #8b5cf6);
+    }
+
+    .dark-mode .strategy-card h3,
+    .dark-mode .interactive-refiner h3,
+    .dark-mode .quiz-section h2,
+    .dark-mode .completion-section h2 {
+      color: var(--accent-dark, #6366f1);
+    }
+
+    .dark-mode .response-text,
+    .dark-mode .refiner-step,
+    .dark-mode .output-display {
+      background: var(--light-bg-dark, #2a2a2a);
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .form-group label {
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .form-group input,
+    .dark-mode .form-group textarea {
+      background: var(--light-bg-dark, #2a2a2a);
+      border-color: var(--border-dark, #333);
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .form-group input:focus,
+    .dark-mode .form-group textarea:focus {
+      border-color: var(--accent-dark, #6366f1);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .dark-mode .quiz-option {
+      background: var(--card-dark, #1e1e1e);
+      border-color: var(--border-dark, #333);
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .quiz-option:hover,
+    .dark-mode .quiz-option.selected {
+      border-color: var(--accent-dark, #6366f1);
+      background: var(--accent-dark-light, #1e1b4f);
+    }
+
+    .dark-mode .btn {
+      background: var(--accent-dark, #6366f1);
+    }
+
+    .dark-mode .btn:hover {
+      background: var(--accent-dark, #4f46e5);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .dark-mode .btn.secondary {
+      background: var(--card-dark, #1e1e1e);
+      color: var(--accent-dark, #6366f1);
+      border-color: var(--accent-dark, #6366f1);
+    }
+
+    .dark-mode .btn.secondary:hover {
+      background: var(--accent-dark, #6366f1);
+      color: var(--text-light, #ffffff);
+    }
+
+    .dark-mode .navigation {
+      border-top-color: var(--border-dark, #333);
+    }
+
+    .dark-mode .nav-link {
+      color: var(--accent-dark, #6366f1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Dark mode detection script -->
+  <script>
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark-mode');
+    }
+  </script>
+
+  <header class="module-header">
+    <div class="container">
+      <h1>🔄 Module 4: Refining Your AI Outputs</h1>
+      <p class="subtitle">Master the art of iterative prompting to transform good responses into exceptional ones through strategic follow-ups.</p>
+    </div>
+  </header>
+
+  <div class="progress-wrapper">
+    <div class="container">
+      <div class="progress-bar">
+        <span class="step completed" title="Completed">📚 Module 1</span>
+        <span class="step completed" title="Completed">🧠 Module 2</span>
+        <span class="step completed" title="Completed">🧱 Module 3</span>
+        <span class="step active">🔄 Module 4</span>
+        <span class="step">🧭 Module 5</span>
+        <span class="step">🎯 Module 6</span>
+        <span class="step">🔧 Module 7</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="module-content">
+    <!-- Table of Contents -->
+    <div class="table-of-contents fade-in">
+      <h3>🎯 What You'll Master in This Module</h3>
+      <ul class="toc-list">
+        <li><a href="#overview">🎯 The Power of Iterative Refinement</a></li>
+        <li><a href="#strategies">🔧 Essential Refinement Strategies</a></li>
+        <li><a href="#examples">💡 Before & After Transformations</a></li>
+        <li><a href="#interactive">🛠️ Interactive Output Refiner</a></li>
+        <li><a href="#techniques">⚡ Advanced Refinement Techniques</a></li>
+        <li><a href="#quiz">🧠 Knowledge Check</a></li>
+      </ul>
+    </div>
+
+    <!-- Overview Section -->
+    <section id="overview" class="section fade-in">
+      <h2>🎯 The Power of Iterative Refinement</h2>
+      <p>Think of AI interaction like sculpting. The first response is your rough marble block - it has potential, but needs careful shaping to become a masterpiece. Refinement prompts are your tools to chisel away imperfections and add the details that make your output truly valuable.</p>
+      
+      <div class="strategy-grid">
+        <div class="strategy-card">
+          <span class="icon">🎯</span>
+          <h3>Precision Targeting</h3>
+          <p>Focus on specific aspects that need improvement rather than asking for general changes.</p>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">🔄</span>
+          <h3>Iterative Improvement</h3>
+          <p>Make incremental improvements through multiple rounds of refinement for best results.</p>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">🎨</span>
+          <h3>Style & Tone Control</h3>
+          <p>Adjust the voice, formality level, and personality to match your exact needs.</p>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">📐</span>
+          <h3>Format Optimization</h3>
+          <p>Transform the structure and presentation to maximize clarity and impact.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Essential Refinement Strategies -->
+    <section id="strategies" class="section fade-in">
+      <h2>🔧 Essential Refinement Strategies</h2>
+      <p>Master these fundamental approaches to transform any AI response into exactly what you need.</p>
+      
+      <div class="techniques-showcase">
+        <div class="technique-example">
+          <div class="technique-title">
+            <span>🔍</span> Clarification & Simplification
+          </div>
+          <div class="prompt-sequence">
+            <div class="prompt-step initial">
+              <div class="step-label">Initial Response Issue:</div>
+              <p>Response is too technical or complex for your audience</p>
+            </div>
+            <div class="prompt-step followup">
+              <div class="step-label">Refinement Prompts:</div>
+              <p>• "Simplify this for a 12-year-old to understand"</p>
+              <p>• "Explain this without technical jargon"</p>
+              <p>• "Use everyday analogies instead of complex terms"</p>
+            </div>
+            <div class="prompt-step result">
+              <div class="step-label">Result:</div>
+              <p>Clear, accessible explanation that anyone can understand</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="technique-example">
+          <div class="technique-title">
+            <span>📈</span> Expansion & Detail Addition
+          </div>
+          <div class="prompt-sequence">
+            <div class="prompt-step initial">
+              <div class="step-label">Initial Response Issue:</div>
+              <p>Good but lacks depth, examples, or comprehensive coverage</p>
+            </div>
+            <div class="prompt-step followup">
+              <div class="step-label">Refinement Prompts:</div>
+              <p>• "Add 3 real-world examples to illustrate each point"</p>
+              <p>• "Expand the second section with more detail"</p>
+              <p>• "Include potential challenges and how to overcome them"</p>
+            </div>
+            <div class="prompt-step result">
+              <div class="step-label">Result:</div>
+              <p>Comprehensive, detailed response with practical examples</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="technique-example">
+          <div class="technique-title">
+            <span>🎭</span> Tone & Voice Adjustment
+          </div>
+          <div class="prompt-sequence">
+            <div class="prompt-step initial">
+              <div class="step-label">Initial Response Issue:</div>
+              <p>Correct information but wrong tone for your context</p>
+            </div>
+            <div class="prompt-step followup">
+              <div class="step-label">Refinement Prompts:</div>
+              <p>• "Make this sound more encouraging and motivational"</p>
+              <p>• "Rewrite in a professional, business-appropriate tone"</p>
+              <p>• "Add humor and make it more conversational"</p>
+            </div>
+            <div class="prompt-step result">
+              <div class="step-label">Result:</div>
+              <p>Same information with perfect tone for your audience</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="technique-example">
+          <div class="technique-title">
+            <span>📊</span> Format & Structure Redesign
+          </div>
+          <div class="prompt-sequence">
+            <div class="prompt-step initial">
+              <div class="step-label">Initial Response Issue:</div>
+              <p>Good content but poor organization or presentation</p>
+            </div>
+            <div class="prompt-step followup">
+              <div class="step-label">Refinement Prompts:</div>
+              <p>• "Convert this into a numbered step-by-step guide"</p>
+              <p>• "Organize this information into a comparison table"</p>
+              <p>• "Reformat as bullet points with clear headers"</p>
+            </div>
+            <div class="prompt-step result">
+              <div class="step-label">Result:</div>
+              <p>Well-organized, scannable content that's easy to follow</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Before & After Examples -->
+    <section id="examples" class="section fade-in">
+      <h2>💡 Before & After: Transformation Examples</h2>
+      <p>See how strategic refinement prompts can completely transform AI responses from good to exceptional.</p>
+      
+      <div class="before-after-grid">
+        <div class="response-card before">
+          <h4>Initial AI Response</h4>
+          <div class="response-text">
+            Photosynthesis is the process by which plants convert sunlight into energy. It involves chlorophyll absorbing light photons, which excite electrons in the chlorophyll molecule. These excited electrons are then used to power chemical reactions that convert carbon dioxide and water into glucose and oxygen.
+          </div>
+          <p><strong>Issues:</strong> Too technical, lacks context, missing practical relevance.</p>
+        </div>
+        
+        <div class="response-card after">
+          <h4>After Refinement</h4>
+          <div class="follow-up-prompt">
+            "Explain this like I'm teaching it to 10-year-olds, use a cooking analogy, and explain why it matters to them."
+          </div>
+          <div class="response-text">
+            Think of plants as tiny chefs in nature's kitchen! Just like how you need ingredients to bake cookies, plants need three things to make their food: sunlight (their oven), water (from their roots), and carbon dioxide (from the air we breathe out). When plants "cook" with these ingredients, they make sugar for energy AND oxygen for us to breathe! That's why we need plants - they're literally making the air we need to live while feeding themselves. Pretty amazing kitchen helpers, right?
+          </div>
+          <p><strong>Improvements:</strong> Age-appropriate, engaging analogy, clear relevance, memorable.</p>
+        </div>
+      </div>
+
+      <div class="before-after-grid">
+        <div class="response-card before">
+          <h4>Initial AI Response</h4>
+          <div class="response-text">
+            To improve team productivity, consider implementing agile methodologies, enhancing communication protocols, utilizing project management software, conducting regular performance reviews, and fostering a collaborative environment through team-building activities.
+          </div>
+          <p><strong>Issues:</strong> Generic advice, no specifics, hard to act on.</p>
+        </div>
+        
+        <div class="response-card after">
+          <h4>After Refinement</h4>
+          <div class="follow-up-prompt">
+            "Make this specific and actionable for a 10-person marketing team. Include exact tools, timeframes, and how to measure success."
+          </div>
+          <div class="response-text">
+            <strong>Marketing Team Productivity Plan:</strong><br><br>
+            
+            <strong>Week 1-2: Communication Setup</strong><br>
+            • Install Slack with channels: #general, #campaigns, #feedback<br>
+            • Daily 15-min standups at 9 AM (try for 2 weeks)<br>
+            • Success metric: Response time under 2 hours<br><br>
+            
+            <strong>Week 3-4: Project Management</strong><br>
+            • Implement Asana with campaign templates<br>
+            • Weekly sprint planning every Monday<br>
+            • Success metric: 90% of tasks completed on time<br><br>
+            
+            <strong>Month 2: Team Building</strong><br>
+            • Monthly "Marketing Mix" lunch (budget: $200)<br>
+            • Cross-training sessions (1 hour/week)<br>
+            • Success metric: Team satisfaction survey score >8/10
+          </div>
+          <p><strong>Improvements:</strong> Specific timeline, exact tools, measurable outcomes, budget considerations.</p>
+        </div>
+      </div>
+
+      <div class="before-after-grid">
+        <div class="response-card before">
+          <h4>Initial AI Response</h4>
+          <div class="response-text">
+            Here are some benefits of regular exercise: improved cardiovascular health, weight management, enhanced mood, better sleep, increased energy levels, stronger bones and muscles, reduced risk of chronic diseases, and improved cognitive function.
+          </div>
+          <p><strong>Issues:</strong> Boring list format, no emotional connection, lacks motivation.</p>
+        </div>
+        
+        <div class="response-card after">
+          <h4>After Refinement</h4>
+          <div class="follow-up-prompt">
+            "Rewrite this as an inspiring story about someone's transformation, make it emotionally engaging, and end with a call to action."
+          </div>
+          <div class="response-text">
+            Meet Sarah, a 35-year-old teacher who couldn't climb a flight of stairs without getting winded. Six months ago, she decided enough was enough. 
+            
+            <strong>Week 1:</strong> Just 10 minutes of walking left her exhausted but proud.
+            <strong>Month 2:</strong> She was sleeping like a baby and waking up actually refreshed.
+            <strong>Month 4:</strong> Colleagues noticed her infectious energy and positive attitude.
+            <strong>Month 6:</strong> She ran her first 5K and felt stronger than she had in decades.
+            
+            Sarah didn't just lose 25 pounds - she gained a life where she feels powerful, confident, and unstoppable. Her students love her energy, her family enjoys more active weekends, and she wakes up excited for each day.
+            
+            <strong>Your turn:</strong> What would your life look like with Sarah's energy? Start with just 10 minutes today. Your future self is waiting.
+          </div>
+          <p><strong>Improvements:</strong> Emotional story, relatable character, inspiring progression, strong call to action.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Output Refiner -->
+    <section id="interactive" class="section fade-in">
+      <h2>🛠️ Interactive Output Refiner</h2>
+      <p>Practice your refinement skills with our interactive tool. Enter an AI response and experiment with different refinement strategies!</p>
+      
+      <div class="interactive-refiner">
+        <h3>🎨 Transform Any AI Response</h3>
+        
+        <div class="refiner-step">
+          <h4>📝 Step 1: Original AI Response</h4>
+          <div class="form-group">
+            <label>Paste an AI response you want to improve:</label>
+            <textarea id="original-response" rows="4" placeholder="e.g., Exercise is good for your health. It helps with weight loss and makes you feel better. You should try to exercise regularly for best results."></textarea>
+          </div>
+        </div>
+        
+        <div class="refiner-step">
+          <h4>🎯 Step 2: Choose Refinement Strategy</h4>
+          <div class="form-group">
+            <label>What needs improvement?</label>
+            <select id="refinement-strategy">
+              <option value="">-- Select a strategy --</option>
+              <option value="simplify">🔍 Simplify for a specific audience</option>
+              <option value="expand">📈 Add more detail and examples</option>
+              <option value="tone">🎭 Change tone and voice</option>
+              <option value="format">📊 Reformat and restructure</option>
+              <option value="context">🎯 Add specific context</option>
+              <option value="actionable">⚡ Make more actionable</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="refiner-step">
+          <h4>🔧 Step 3: Craft Your Refinement Prompt</h4>
+          <div class="form-group">
+            <label>Your refinement instruction:</label>
+            <textarea id="refinement-prompt" rows="3" placeholder="e.g., Rewrite this for busy parents with specific 15-minute workout routines they can do at home"></textarea>
+            <small>Tip: Be specific about audience, format, and desired outcome</small>
+          </div>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn" onclick="generateRefinement()">🚀 Generate Refined Prompt</button>
+          <button class="btn secondary" onclick="clearRefiner()">🗑️ Clear All</button>
+        </div>
+        
+        <div id="refinement-output" class="output-display" style="display: none;">
+          <button class="copy-button" onclick="copyToClipboard(this)">📋 Copy</button>
+          <div id="refined-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Advanced Refinement Techniques -->
+    <section id="techniques" class="section fade-in">
+      <h2>⚡ Advanced Refinement Techniques</h2>
+      <p>Master these professional-level strategies to achieve expert-quality outputs consistently.</p>
+      
+      <div class="strategy-grid">
+        <div class="strategy-card">
+          <span class="icon">🎯</span>
+          <h3>Targeted Correction</h3>
+          <p>Point out specific issues and guide the AI toward better solutions.</p>
+          <div class="response-text">
+            "The second paragraph is off-topic. Focus on practical benefits instead of theory, and add a concrete example from the healthcare industry."
+          </div>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">🔗</span>
+          <h3>Chain Refinement</h3>
+          <p>Make multiple refinements in sequence, building on each improvement.</p>
+          <div class="response-text">
+            "First, make this more conversational. → Now add personal anecdotes. → Finally, include actionable takeaways."
+          </div>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">🎪</span>
+          <h3>Persona-Driven Refinement</h3>
+          <p>Ask the AI to rewrite from a specific expert's perspective.</p>
+          <div class="response-text">
+            "Rewrite this as if you're a motivational coach speaking to someone who's failed at fitness before."
+          </div>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">📐</span>
+          <h3>Constraint-Based Improvement</h3>
+          <p>Use specific limitations to force creativity and precision.</p>
+          <div class="response-text">
+            "Rewrite this in exactly 3 sentences, using only words a 10-year-old would know, while keeping all the key information."
+          </div>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">🎨</span>
+          <h3>Style Mimicry</h3>
+          <p>Ask the AI to match a specific writing style or format.</p>
+          <div class="response-text">
+            "Rewrite this in the style of a TED talk opening - start with a surprising question or statistic."
+          </div>
+        </div>
+        
+        <div class="strategy-card">
+          <span class="icon">🔄</span>
+          <h3>Perspective Switching</h3>
+          <p>Change the viewpoint to make content more relevant or engaging.</p>
+          <div class="response-text">
+            "Rewrite this from the perspective of someone who just discovered this solution and is excited to share it with friends."
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Knowledge Check Quiz -->
+    <section id="quiz" class="section fade-in">
+      <div class="quiz-section">
+        <h2>🧠 Test Your Refinement Skills</h2>
+        <p>Let's see how well you understand the art of iterative AI improvement!</p>
+        
+        <div id="quiz-container"></div>
+        
+        <div class="action-buttons">
+          <button class="btn" onclick="resetQuiz()">🔄 Retake Quiz</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Completion Section -->
+    <section class="completion-section" id="completion">
+      <h2>🎉 Congratulations!</h2>
+      <p>You've mastered the art of refinement prompting! You can now take any AI response and systematically improve it to meet your exact needs through strategic follow-ups.</p>
+      
+      <div class="action-buttons">
+        <div id="completion-actions">
+          <button class="btn" id="complete-btn" onclick="markComplete()">✅ Mark Module 4 Complete</button>
+          <button class="btn" id="restart-btn" onclick="restartModule()" style="display: none;">🔄 Study This Module Again</button>
+        </div>
+      </div>
+      
+      <div id="completion-status"></div>
+    </section>
+
+    <!-- Navigation -->
+    <div class="navigation">
+      <a href="module3.html" class="nav-link">← Previous: Building Better Prompts</a>
+      <a href="module5.html" class="nav-link next">Next: Context & Specificity →</a>
+    </div>
+
+    <!-- Home Link -->
+    <div style="text-align: center; margin: 2rem 0;">
+      <a href="index.html" class="btn secondary">🏠 Back to Home</a>
+    </div>
+  </main>
+
+  <script>
+    // Quiz data for Module 4
+    const quizData = [
+      {
+        question: "What's the main purpose of refinement prompts?",
+        options: [
+          "To start a completely new conversation",
+          "To improve and adjust existing AI responses",
+          "To make responses longer",
+          "To confuse the AI"
+        ],
+        answer: 1,
+        explanation: "Refinement prompts are used to improve, adjust, and perfect existing AI responses rather than starting over."
+      },
+      {
+        question: "Which refinement strategy would you use if an AI response is too technical?",
+        options: [
+          "Expansion & Detail Addition",
+          "Format & Structure Redesign", 
+          "Clarification & Simplification",
+          "Tone & Voice Adjustment"
+        ],
+        answer: 2,
+        explanation: "Clarification & Simplification is the right strategy when content is too technical or complex for your audience."
+      },
+      {
+        question: "What makes a refinement prompt effective?",
+        options: [
+          "Being as vague as possible",
+          "Being specific about what needs to change",
+          "Always asking for longer responses",
+          "Using complex technical language"
+        ],
+        answer: 1,
+        explanation: "Effective refinement prompts are specific about what needs to change and how you want it improved."
+      },
+      {
+        question: "When should you use chain refinement?",
+        options: [
+          "Never, it's too complicated",
+          "Only for technical topics",
+          "When you need multiple improvements in sequence",
+          "Only for creative writing"
+        ],
+        answer: 2,
+        explanation: "Chain refinement is perfect when you need to make multiple improvements sequentially, building on each change."
+      },
+      {
+        question: "What's an example of constraint-based improvement?",
+        options: [
+          "Make this longer and more detailed",
+          "Add more examples to explain this",
+          "Rewrite in exactly 2 sentences using simple words",
+          "Change the topic completely"
+        ],
+        answer: 2,
+        explanation: "Constraint-based improvement uses specific limitations (like word count, complexity level) to force precision and creativity."
+      }
+    ];
+
+    // Refinement strategies and their prompts
+    const refinementStrategies = {
+      simplify: "Simplify this for [target audience]. Use everyday language and avoid technical terms. Include relatable examples.",
+      expand: "Expand this with more detail. Add 2-3 specific examples, explain the 'why' behind each point, and include potential challenges.",
+      tone: "Rewrite this with a [describe tone] tone. Make it more [encouraging/professional/conversational] and adjust the voice to match [target audience].",
+      format: "Reformat this as a [list/table/step-by-step guide]. Organize with clear headers and make it easy to scan.",
+      context: "Add specific context for [situation/industry/audience]. Include relevant examples and make it directly applicable to [specific use case].",
+      actionable: "Make this more actionable. Include specific steps, timelines, and measurable outcomes. Tell readers exactly what to do next."
+    };
+
+    // Initialize quiz
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+      
+      quizData.forEach((q, index) => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+        card.innerHTML = `
+          <h4>Question ${index + 1}</h4>
+          <p><strong>${q.question}</strong></p>
+          <div class="quiz-options">
+            ${q.options.map((opt, i) => `
+              <label class="quiz-option" onclick="selectOption(${index}, ${i})">
+                <input type="radio" name="q${index}" value="${i}" style="display: none;" />
+                <span>${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+          <button class="btn" onclick="checkAnswer(${index}, ${q.answer})" style="margin-top: 1rem;">Check Answer</button>
+          <div id="feedback${index}" class="feedback" style="display: none;"></div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function selectOption(questionIndex, optionIndex) {
+      const question = document.querySelectorAll('.quiz-card')[questionIndex];
+      const options = question.querySelectorAll('.quiz-option');
+      
+      options.forEach(opt => opt.classList.remove('selected'));
+      options[optionIndex].classList.add('selected');
+      
+      const radio = question.querySelector(`input[value="${optionIndex}"]`);
+      radio.checked = true;
+    }
+
+    function checkAnswer(questionIndex, correctAnswer) {
+      const question = document.querySelectorAll('.quiz-card')[questionIndex];
+      const selected = question.querySelector('input[name="q' + questionIndex + '"]:checked');
+      const feedback = document.getElementById(`feedback${questionIndex}`);
+      const options = question.querySelectorAll('.quiz-option');
+      
+      if (!selected) {
+        feedback.textContent = "⚠️ Please select an answer first.";
+        feedback.className = "feedback incorrect";
+        feedback.style.display = "block";
+        return;
+      }
+      
+      const selectedValue = parseInt(selected.value);
+      
+      // Reset all options
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+      
+      if (selectedValue === correctAnswer) {
+        options[selectedValue].classList.add('correct');
+        feedback.textContent = "✅ Correct! " + quizData[questionIndex].explanation;
+        feedback.className = "feedback correct";
+      } else {
+        options[selectedValue].classList.add('incorrect');
+        options[correctAnswer].classList.add('correct');
+        feedback.textContent = "❌ Not quite right. " + quizData[questionIndex].explanation;
+        feedback.className = "feedback incorrect";
+      }
+      
+      feedback.style.display = "block";
+    }
+
+    function resetQuiz() {
+      renderQuiz();
+    }
+
+    // Refinement functionality
+    function generateRefinement() {
+      const originalResponse = document.getElementById('original-response').value.trim();
+      const strategy = document.getElementById('refinement-strategy').value;
+      const customPrompt = document.getElementById('refinement-prompt').value.trim();
+      
+      if (!originalResponse) {
+        alert('Please enter an original AI response to refine.');
+        return;
+      }
+      
+      let refinementText = '';
+      
+      if (customPrompt) {
+        refinementText = `Original Response:\n"${originalResponse}"\n\nRefinement Prompt:\n"${customPrompt}"`;
+      } else if (strategy && refinementStrategies[strategy]) {
+        refinementText = `Original Response:\n"${originalResponse}"\n\nSuggested Refinement Prompt:\n"${refinementStrategies[strategy]}"`;
+      } else {
+        alert('Please either select a strategy or write a custom refinement prompt.');
+        return;
+      }
+      
+      document.getElementById('refined-result').textContent = refinementText;
+      document.getElementById('refinement-output').style.display = 'block';
+      
+      // Scroll to result
+      document.getElementById('refinement-output').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
+
+    function clearRefiner() {
+      document.getElementById('original-response').value = '';
+      document.getElementById('refinement-strategy').value = '';
+      document.getElementById('refinement-prompt').value = '';
+      document.getElementById('refinement-output').style.display = 'none';
+    }
+
+    // Update refinement prompt when strategy changes
+    document.addEventListener('DOMContentLoaded', function() {
+      const strategySelect = document.getElementById('refinement-strategy');
+      const promptTextarea = document.getElementById('refinement-prompt');
+      
+      if (strategySelect && promptTextarea) {
+        strategySelect.addEventListener('change', function() {
+          const strategy = this.value;
+          if (strategy && refinementStrategies[strategy]) {
+            promptTextarea.value = refinementStrategies[strategy];
+          } else {
+            promptTextarea.value = '';
+          }
+        });
+      }
+    });
+
+    // Copy functionality
+    function copyToClipboard(button) {
+      const parent = button.parentElement;
+      const textToCopy = parent.textContent.replace('📋 Copy', '').trim();
+      
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalText = button.textContent;
+        button.textContent = '✅ Copied!';
+        button.style.background = '#22c55e';
+        
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.background = '';
+        }, 2000);
+      }).catch(() => {
+        alert('Copy failed. Please try selecting and copying manually.');
+      });
+    }
+
+    // Completion functionality
+    function markComplete() {
+      localStorage.setItem('module4Complete', 'true');
+      localStorage.setItem('module4CompletedAt', new Date().toISOString());
+      const section = document.getElementById('completion');
+      const status = document.getElementById('completion-status');
+      
+      section.classList.add('completed');
+      status.innerHTML = `
+        <h3>🎉 Module 4 Complete!</h3>
+        <p>Excellent work! You've mastered the art of refinement prompting. You can study this module again anytime!</p>
+        <a href="module5.html" class="btn">🚀 Continue to Module 5</a>
+      `;
+      
+      // Update completion UI
+      updateCompletionUI();
+      
+      // Update progress in home page
+      window.dispatchEvent(new Event('moduleCompleted'));
+    }
+
+    // UPDATE COMPLETION UI
+    function updateCompletionUI() {
+      const completeBtn = document.getElementById('complete-btn');
+      const restartBtn = document.getElementById('restart-btn');
+      
+      if (localStorage.getItem('module4Complete') === 'true') {
+        completeBtn.style.display = 'none';
+        restartBtn.style.display = 'inline-block';
+      } else {
+        completeBtn.style.display = 'inline-block';
+        restartBtn.style.display = 'none';
+      }
+    }
+
+    // RESTART MODULE FUNCTIONALITY
+    function restartModule() {
+      if (confirm('🔄 Are you sure you want to restart this module? This will reset your progress but keep your completion history.')) {
+        // Reset completion section
+        const section = document.getElementById('completion');
+        const status = document.getElementById('completion-status');
+        section.classList.remove('completed');
+        status.innerHTML = '';
+        
+        // Reset all quiz attempts
+        document.querySelectorAll('.quiz-question').forEach(question => {
+          question.classList.remove('answered');
+          const buttons = question.querySelectorAll('button');
+          buttons.forEach(btn => {
+            btn.classList.remove('correct', 'incorrect');
+            btn.disabled = false;
+          });
+        });
+        
+        // Reset form fields
+        document.querySelectorAll('input[type="text"], textarea').forEach(input => {
+          input.value = '';
+        });
+        
+        // Show restart notification
+        status.innerHTML = '<p>🔄 Module restarted! You can now study through the content again.</p>';
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Fade-in animation on scroll
+    function addScrollAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, {
+        threshold: 0.1
+      });
+
+      document.querySelectorAll('.fade-in').forEach(section => {
+        observer.observe(section);
+      });
+    }
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      renderQuiz();
+      addScrollAnimations();
+      
+      // Check if module is already completed
+      if (localStorage.getItem('module4Complete') === 'true') {
+        const section = document.getElementById('completion');
+        const status = document.getElementById('completion-status');
+        const completedAt = localStorage.getItem('module4CompletedAt');
+        const completedDate = completedAt ? new Date(completedAt).toLocaleDateString() : 'previously';
+        section.classList.add('completed');
+        status.innerHTML = `
+          <h3>✅ Module 4 Already Complete!</h3>
+          <p>Great job! You completed this module ${completedDate}. You can study it again anytime!</p>
+          <a href="module5.html" class="btn">🚀 Continue to Module 5</a>
+        `;
+      }
+      
+      // Update completion UI
+      updateCompletionUI();
+    });
+  </script>
+</body>
+</html>

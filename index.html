@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generative AI Tutorial</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    .card {
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .card.selected {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, var(--accent), #4a47a3);
+      color: white;
+    }
+    
+    .path-description {
+      text-align: center;
+      margin-top: 1rem;
+      font-style: italic;
+      color: var(--text);
+      opacity: 0.8;
+    }
+    
+    .module-link {
+      transition: all 0.3s ease;
+      margin: 1rem 0;
+      position: relative;
+    }
+    
+    .focus-legend {
+      display: inline-block;
+      font-size: 0.85rem;
+      color: var(--accent);
+      margin-left: 1rem;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    
+    #modules-container {
+      margin: 2rem 0;
+    }
+    
+    .focus-business {
+      border-left: 4px solid #2563eb;
+    }
+    
+    .focus-technical {
+      border-left: 4px solid #dc2626;
+    }
+    
+    .focus-creative {
+      border-left: 4px solid #7c3aed;
+    }
+
+    /* Hero Stats Styling */
+    .hero-stats {
+      background: var(--card, #ffffff);
+      padding: 3rem 1rem;
+      margin: 1rem auto 3rem auto;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 2rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 1.8rem 1rem;
+      background: linear-gradient(135deg, var(--light-bg, #f8f9fa), #ffffff);
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .stat-card h3 {
+      font-size: 2.2rem;
+      margin: 0 0 0.8rem 0;
+      color: var(--accent, #4a47a3);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent, #4a47a3), #6c63ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-card p {
+      margin: 0;
+      color: var(--text, #555);
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    /* Progress Overview Styling */
+    .progress-overview {
+      background: linear-gradient(135deg, var(--accent, #4a47a3), #6c63ff);
+      color: white;
+      padding: 2.5rem 2rem;
+      margin: 3rem auto;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(74, 71, 163, 0.2);
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .progress-overview h2 {
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
+
+    .progress-container {
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      height: 12px;
+      margin: 1.5rem auto;
+      max-width: 350px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00d4aa, #00f5d4);
+      border-radius: 12px;
+      width: 0%;
+      transition: width 0.8s ease;
+      box-shadow: 0 0 10px rgba(0, 212, 170, 0.3);
+    }
+
+    .progress-text {
+      margin: 1.2rem 0 0 0;
+      font-size: 1rem;
+      opacity: 0.95;
+      font-weight: 500;
+    }
+
+    /* Benefits Section Styling */
+    .benefits {
+      padding: 4rem 1rem;
+      background: var(--light-bg, #f8f9fa);
+      margin: 3rem auto;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .benefits h2 {
+      text-align: center;
+      margin-bottom: 3.5rem;
+      color: var(--text, #333);
+      font-size: 2.2rem;
+      font-weight: 600;
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .benefit-card {
+      background: var(--card, #ffffff);
+      padding: 2.5rem 2rem;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      border: 1px solid var(--border, #e0e0e0);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .benefit-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+    }
+
+    .benefit-card:hover .benefit-icon {
+      transform: scale(1.1);
+    }
+
+    .benefit-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      transition: transform 0.3s ease;
+    }
+
+    .benefit-card h3 {
+      margin: 0 0 1.2rem 0;
+      color: var(--accent, #4a47a3);
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    .benefit-card p {
+      margin: 0;
+      color: var(--text, #666);
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    /* Dark Mode Support for New Elements */
+    .dark-mode .hero-stats {
+      background: var(--card-dark, #2d3748);
+    }
+
+    .dark-mode .stat-card {
+      background: var(--light-bg-dark, #374151);
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .stat-card h3 {
+      color: var(--accent-dark, #6366f1);
+    }
+
+    .dark-mode .benefits {
+      background: var(--bg-dark, #1a202c);
+    }
+
+    .dark-mode .benefits h2 {
+      color: var(--text-dark, #e2e8f0);
+    }
+
+    .dark-mode .benefit-card {
+      background: var(--card-dark, #2d3748);
+      border-color: var(--border-dark, #4a5568);
+    }
+
+    .dark-mode .benefit-card h3 {
+      color: var(--accent-dark, #6366f1);
+    }
+
+    .dark-mode .benefit-card p {
+      color: var(--text-dark, #cbd5e0);
+    }
+
+    /* Container for centering content */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* Learning Paths Section */
+    .learning-paths {
+      margin: 4rem auto;
+      max-width: 1200px;
+      padding: 0 1rem;
+    }
+
+    /* Features Preview Section */
+    .features-preview {
+      margin: 4rem auto;
+      max-width: 1200px;
+      padding: 0 1rem;
+    }
+
+    /* Prompt Playground Section */
+    .prompt-playground {
+      margin: 4rem auto;
+      max-width: 1200px;
+      padding: 0 1rem;
+    }
+
+    /* Modules Container */
+    #modules-container {
+      margin: 4rem auto;
+      max-width: 1200px;
+      padding: 0 1rem;
+    }
+
+    /* Section Spacing */
+    .hero-stats, 
+    .progress-overview, 
+    .benefits, 
+    .learning-path-section {
+      margin: 4rem auto;
+    }
+
+    .hero-stats {
+      margin-top: 3rem;
+    }
+
+    .learning-path-section {
+      margin-bottom: 5rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .hero-stats, 
+      .progress-overview, 
+      .benefits, 
+      .learning-path-section {
+        margin: 3rem 0;
+      }
+
+      .hero-stats {
+        margin-top: 2rem;
+      }
+
+      .learning-path-section {
+        margin-bottom: 3rem;
+      }
+    }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+      
+      .benefits-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .stat-card h3 {
+        font-size: 2rem;
+      }
+      
+      .benefit-card {
+        padding: 1.5rem;
+      }
+
+      /* Responsive adjustments for centered sections */
+      .hero-stats, 
+      .progress-overview, 
+      .benefits, 
+      .learning-paths,
+      .features-preview,
+      .prompt-playground,
+      #modules-container {
+        margin: 3rem auto;
+      }
+
+      .hero-stats {
+        margin-top: 2rem;
+      }
+
+      .container {
+        padding: 0 0.5rem;
+      }
+    }
+
+    /* Footer Styling */
+    .cta-footer {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-align: center;
+      padding: 4rem 1rem;
+      margin: 5rem auto 0 auto;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .cta-footer h2 {
+      margin: 0 0 2rem 0;
+      font-size: 2.5rem;
+      font-weight: 600;
+    }
+
+    .site-footer {
+      background: var(--dark-bg, #2c3e50);
+      color: var(--light-text, white);
+      text-align: center;
+      padding: 2rem 1rem;
+      position: relative;
+      overflow: hidden;
+      margin: 0 auto;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .site-footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+    }
+
+    .site-footer p {
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    .site-footer a {
+      color: #76c7c0;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .site-footer a:hover {
+      color: #9fd8d4;
+    }
+
+    /* Typography Improvements */
+    body {
+      line-height: 1.7;
+      font-weight: 400;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      line-height: 1.3;
+      font-weight: 600;
+    }
+
+    p {
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="theme-toggle">
+      <label>
+        <input type="checkbox" id="theme-switch" />
+        <span>🌙 / ☀️</span>
+      </label>
+    </div>
+    <h1>🌍 Welcome to the World of Generative AI</h1>
+    <p class="subtitle">Master the art of prompt engineering — the skill of speaking AI fluently.</p>
+    <a href="#start" class="cta-button">🚀 Start Learning</a>
+  </header>
+
+  <section class="hero-stats">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>7</h3>
+        <p>Interactive Modules</p>
+      </div>
+      <div class="stat-card">
+        <h3>20+</h3>
+        <p>Practical Examples</p>
+      </div>
+      <div class="stat-card">
+        <h3>3</h3>
+        <p>Skill Levels</p>
+      </div>
+      <div class="stat-card">
+        <h3>Free</h3>
+        <p>Complete Course</p>
+      </div>
+    </div>
+  </section>
+
+  <nav class="section-nav">
+    <a href="#start">Learning Paths</a>
+    <a href="#features">Features</a>
+    <a href="#playground">Try It Out</a>
+  </nav>
+
+  
+  <section class="learning-paths" id="start">
+    <div class="container">
+      <h2>🎯 Choose Your Learning Path</h2>
+      <div class="path-grid">
+        <div class="card beginner" onclick="selectLearningPath('beginner')">🌱 Beginner</div>
+        <div class="card intermediate" onclick="selectLearningPath('intermediate')">🚀 Intermediate</div>
+        <div class="card advanced" onclick="selectLearningPath('advanced')">🎓 Advanced</div>
+        <div class="card complete selected" onclick="selectLearningPath('complete')">📚 Complete Course</div>
+      </div>
+      <p id="path-description" class="path-description">Complete Course: Access all modules (1-7) for comprehensive learning</p>
+    </div>
+  </section>
+
+  <section class="progress-overview">
+    <h2>📊 Your Progress</h2>
+    <div class="progress-container">
+      <div class="progress-bar-fill" id="overall-progress"></div>
+    </div>
+    <p class="progress-text"><span id="completed-modules">0</span>/7 modules completed • <span id="estimated-time">~2 hours remaining</span></p>
+  </section>
+
+
+ <div id="modules-container">
+   <div class="container">
+
+  <div class="module-link" data-modules="1,2,3,4,5,6,7" data-focus="creative">
+  <a href="module1.html" class="cta-button" id="module1-link">
+    📘 Start Module 1: What Is Prompt Engineering?
+  </a>
+  <span class="focus-legend">🎨 Creative</span>
+  <span id="module1-status" class="badge"></span>
+</div>
+
+<div class="module-link" data-modules="1,2,3,4,5,6,7" data-focus="technical creative">
+  <a href="module2.html" class="cta-button" id="module2-link">
+    🧠 Start Module 2: Types of Prompts
+  </a>
+  <span class="focus-legend">⚙️ Technical | 🎨 Creative</span>
+  <span id="module2-status" class="badge"></span>
+</div>
+
+<div class="module-link" data-modules="1,2,3,4,5,6,7" data-focus="business creative">
+  <a href="module3.html" class="cta-button" id="module3-link">
+    🧱 Start Module 3: Building Better Prompts
+  </a>
+  <span class="focus-legend">💼 Business | 🎨 Creative</span>
+  <span id="module3-status" class="badge"></span>
+</div>
+
+<div class="module-link" data-modules="4,5,6,7" data-focus="business technical">
+  <a href="module4.html" class="cta-button" id="module4-link">
+    🔄 Start Module 4: Refining Outputs with Follow-Up Prompts
+  </a>
+  <span class="focus-legend">💼 Business | ⚙️ Technical</span>
+  <span id="module4-status" class="badge"></span>
+</div>
+
+<div class="module-link" data-modules="4,5,6,7" data-focus="business">
+  <a href="module5.html" class="cta-button" id="module5-link">
+    🧭 Start Module 5: Strategic Prompting
+  </a>
+  <span class="focus-legend">💼 Business</span>
+  <span id="module5-status" class="badge"></span>
+</div>
+
+<div class="module-link" data-modules="6,7" data-focus="technical creative">
+  <a href="module6.html" class="cta-button" id="module6-link">
+    🎯 Start Module 6: Advanced Prompting Techniques
+  </a>
+  <span class="focus-legend">⚙️ Technical | 🎨 Creative</span>
+  <span id="module6-status" class="badge"></span>
+</div>
+
+ <div class="module-link" data-modules="6,7" data-focus="technical">
+  <a href="module7.html" class="cta-button" id="module7-link">
+    🔧 Start Module 7: Iterative Prompting
+  </a>
+  <span class="focus-legend">⚙️ Technical</span>
+  <span id="module7-status" class="badge"></span>
+</div>
+
+   </div>
+</div>
+
+  <section class="features-preview" id="features">
+    <div class="container">
+      <h2>✨ What You'll Learn</h2>
+      <ul class="features-list">
+        <li>✅ Craft effective prompts for any use case</li>
+        <li>✅ Explore real-time AI interactions</li>
+        <li>✅ Learn through challenges and examples</li>
+        <li>✅ Track your progress and earn achievements</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="benefits">
+    <h2>🎯 Why Learn Prompt Engineering?</h2>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon">🚀</div>
+        <h3>Career Boost</h3>
+        <p>Essential skill for the AI-powered workplace. Stand out with prompt engineering expertise.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">⚡</div>
+        <h3>Save Time</h3>
+        <p>Get better AI results in less time with well-crafted prompts that work the first time.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">🎨</div>
+        <h3>Unlock Creativity</h3>
+        <p>Discover new ways to use AI for creative, analytical, and problem-solving tasks.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">🎓</div>
+        <h3>Learn by Doing</h3>
+        <p>Interactive exercises and real-world examples make learning engaging and practical.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="prompt-playground" id="playground">
+    <div class="container">
+      <h2>🧪 Prompt Playground</h2>
+      <form id="prompt-form">
+        <textarea id="prompt-input" placeholder="Type your prompt here..." rows="4"></textarea>
+        <button type="submit" class="cta-button">Submit Prompt</button>
+      </form>
+
+      <div class="prompt-templates">
+        <h3>Try a Template:</h3>
+        <button onclick="fillPrompt('Write a poem about the ocean.')">🌊 Poem</button>
+        <button onclick="fillPrompt('Summarize this article: [paste text]')">📰 Summary</button>
+        <button onclick="fillPrompt('Explain quantum computing to a 5-year-old.')">🧠 Explain</button>
+      </div>
+
+      <pre id="prompt-output">Your response will appear here...</pre>
+    </div>
+  </section>
+
+<script src="playground.js"></script>
+
+
+  <footer class="cta-footer">
+    <h2>Ready to Speak AI Fluently?</h2>
+    <a href="#start" class="cta-button large">🧠 Begin Your Journey</a>
+  </footer>
+
+  <footer class="site-footer">
+    <p>Made with ❤️ by Aladdin | <a href="#">GitHub</a> | <a href="#">About</a></p>
+  </footer>
+
+  <script>
+    const switcher = document.getElementById('theme-switch');
+
+// Load saved theme on page load
+if (localStorage.getItem('darkMode') === 'true') {
+  document.body.classList.add('dark-mode');
+  switcher.checked = true;
+}
+
+switcher.addEventListener('change', () => {
+  const isDark = switcher.checked;
+  document.body.classList.toggle('dark-mode', isDark);
+  localStorage.setItem('darkMode', isDark);
+});
+
+  </script>
+ <script src="playground.js"></script>
+</body>
+
+<script>
+  
+  // ✅ Apply dark mode immediately on page load
+  if (localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark-mode');
+  }
+
+const mod2Done = localStorage.getItem('module2Complete') === 'true';
+if (mod2Done) {
+  document.getElementById('module2-status').textContent = '✅ Completed';
+}
+
+
+// ✅ Load and apply saved dark mode
+if (localStorage.getItem('darkMode') === 'true') {
+  document.body.classList.add('dark-mode');
+  document.getElementById('theme-switch').checked = true;
+}
+
+document.getElementById('theme-switch').addEventListener('change', () => {
+  const isDark = document.getElementById('theme-switch').checked;
+  document.body.classList.toggle('dark-mode', isDark);
+  localStorage.setItem('darkMode', isDark);
+});
+
+// Progress tracking functionality
+function updateOverallProgress() {
+  const totalModules = 7;
+  let completedCount = 0;
+  
+  // Check each module's completion status
+  for (let i = 1; i <= totalModules; i++) {
+    if (localStorage.getItem(`module${i}Complete`) === 'true') {
+      completedCount++;
+    }
+  }
+  
+  // Update progress bar
+  const progressPercent = (completedCount / totalModules) * 100;
+  const progressBar = document.getElementById('overall-progress');
+  if (progressBar) {
+    progressBar.style.width = progressPercent + '%';
+  }
+  
+  // Update text
+  const completedElement = document.getElementById('completed-modules');
+  if (completedElement) {
+    completedElement.textContent = completedCount;
+  }
+  
+  // Update estimated time
+  const remainingModules = totalModules - completedCount;
+  const estimatedTime = remainingModules * 15; // 15 minutes per module
+  const timeElement = document.getElementById('estimated-time');
+  if (timeElement) {
+    if (remainingModules === 0) {
+      timeElement.textContent = '🎉 Course completed!';
+    } else if (estimatedTime < 60) {
+      timeElement.textContent = `~${estimatedTime} minutes remaining`;
+    } else {
+      const hours = Math.ceil(estimatedTime / 60);
+      timeElement.textContent = `~${hours} hour${hours > 1 ? 's' : ''} remaining`;
+    }
+  }
+  
+  // Add celebration animation if just completed
+  if (completedCount === totalModules) {
+    celebrateCompletion();
+  }
+}
+
+function celebrateCompletion() {
+  // Simple celebration effect
+  const progressOverview = document.querySelector('.progress-overview');
+  if (progressOverview) {
+    progressOverview.style.background = 'linear-gradient(135deg, #00d4aa, #00f5d4)';
+    progressOverview.style.transform = 'scale(1.02)';
+    setTimeout(() => {
+      progressOverview.style.transform = 'scale(1)';
+    }, 300);
+  }
+}
+
+// Add fade-in animation on scroll
+function addScrollAnimations() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, {
+    threshold: 0.1
+  });
+
+  // Observe all major sections
+  document.querySelectorAll('.hero-stats, .progress-overview, .benefits, .prompt-playground').forEach(section => {
+    section.style.opacity = '0';
+    section.style.transform = 'translateY(30px)';
+    section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(section);
+  });
+}
+
+// Initialize everything when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Update progress on page load
+  updateOverallProgress();
+  
+  // Add scroll animations
+  addScrollAnimations();
+  
+  // Update progress every few seconds in case user completes modules in other tabs
+  setInterval(updateOverallProgress, 5000);
+});
+
+// ✅ Module completion badges
+if (localStorage.getItem('module1Complete') === 'true') {
+  document.getElementById('module1-status').textContent = '✅ Completed';
+}
+
+if (localStorage.getItem('module2Complete') === 'true') {
+  document.getElementById('module2-status').textContent = '✅ Completed';
+}
+
+if (localStorage.getItem('module3Complete') === 'true') {
+  document.getElementById('module3-status').textContent = '✅ Completed';
+}
+
+if (localStorage.getItem('module4Complete') === 'true') {
+  document.getElementById('module4-status').textContent = '✅ Completed';
+}
+
+if (localStorage.getItem('module5Complete') === 'true') {
+  document.getElementById('module5-status').textContent = '✅ Completed';
+}
+
+if (localStorage.getItem('module6Complete') === 'true') {
+  document.getElementById('module6-status').textContent = '✅ Completed';
+}
+
+if (localStorage.getItem('module7Complete') === 'true') {
+  document.getElementById('module7-status').textContent = '✅ Completed';
+}
+
+// Learning path functionality
+let currentPath = 'complete';
+
+function selectLearningPath(path) {
+  currentPath = path;
+  
+  // Update visual selection
+  document.querySelectorAll('.card').forEach(card => card.classList.remove('selected'));
+  document.querySelector(`.card.${path}`).classList.add('selected');
+  
+  // Update description
+  const descriptions = {
+    beginner: 'Beginner Path: Start with the fundamentals (Modules 1-3)',
+    intermediate: 'Intermediate Path: Build on basics with advanced techniques (Modules 4-5)', 
+    advanced: 'Advanced Path: Master complex prompting strategies (Modules 6-7)',
+    complete: 'Complete Course: Access all modules (1-7) for comprehensive learning'
+  };
+  
+  document.getElementById('path-description').textContent = descriptions[path];
+  
+  // Show/hide modules based on path
+  const pathModules = {
+    beginner: [1, 2, 3],
+    intermediate: [4, 5],
+    advanced: [6, 7],
+    complete: [1, 2, 3, 4, 5, 6, 7]
+  };
+  
+  const modulesToShow = pathModules[path];
+  filterModules(modulesToShow);
+  
+  // Save selection
+  localStorage.setItem('selectedLearningPath', path);
+}
+
+// Universal module filtering function
+function filterModules(modulesToShow) {
+  const allModules = document.querySelectorAll('.module-link');
+  
+  allModules.forEach(moduleLink => {
+    const moduleData = moduleLink.getAttribute('data-modules').split(',').map(n => parseInt(n));
+    const shouldShow = modulesToShow.some(module => moduleData.includes(module));
+    
+    if (shouldShow) {
+      moduleLink.style.display = 'block';
+    } else {
+      moduleLink.style.display = 'none';
+    }
+  });
+}
+
+// Load saved path on page load
+window.addEventListener('load', () => {
+  const savedPath = localStorage.getItem('selectedLearningPath') || 'complete';
+  selectLearningPath(savedPath);
+});
+
+
+  window.onload = () => {
+    const completed = localStorage.getItem('module1Complete') === 'true';
+    if (completed) {
+      document.getElementById('module1-status').textContent = '✅ Completed';
+    }
+
+    if (typeof renderQuiz === 'function') {
+      renderQuiz();
+    }
+  };
+</script>
+
+
+
+</html>
