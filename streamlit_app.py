@@ -279,7 +279,20 @@ def main():
         "⚡ Module 7: Iterative Prompting": "module7.html"
     }
     
-    selected_module = st.sidebar.selectbox("Choose a module:", list(modules.keys()))
+    # Initialize selected module in session state
+    if 'selected_module' not in st.session_state:
+        st.session_state.selected_module = "🏠 Home"
+    
+    # Module selection with session state
+    selected_module = st.sidebar.selectbox(
+        "Choose a module:", 
+        list(modules.keys()),
+        index=list(modules.keys()).index(st.session_state.selected_module)
+    )
+    
+    # Update session state when selection changes
+    if selected_module != st.session_state.selected_module:
+        st.session_state.selected_module = selected_module
     
     # Progress tracking
     st.sidebar.markdown("---")
@@ -379,6 +392,18 @@ def main():
                 </span>
             </div>
             """, unsafe_allow_html=True)
+        
+        # Add start learning button at the bottom of homepage
+        st.markdown("---")
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("🚀 Start Learning - Go to Module 1", key="start_learning"):
+                st.session_state.selected_module = "📖 Module 1: Getting Started"
+                st.rerun()
+            
+            if st.button("📚 Continue to Module 2", key="continue_module2"):
+                st.session_state.selected_module = "💡 Module 2: Types of Prompts"
+                st.rerun()
     
     else:
         # Load and display selected module
@@ -406,15 +431,32 @@ def main():
             
             with col1:
                 if st.button("⬅️ Previous Module"):
-                    st.info("Navigate to previous module")
+                    # Find current module index and navigate to previous
+                    current_modules = list(modules.keys())
+                    current_idx = current_modules.index(selected_module)
+                    if current_idx > 0:
+                        prev_module = current_modules[current_idx - 1]
+                        st.session_state.selected_module = prev_module
+                        st.rerun()
+                    else:
+                        st.info("You're already at the first module")
             
             with col2:
                 if st.button("🏠 Back to Home"):
+                    st.session_state.selected_module = "🏠 Home"
                     st.rerun()
             
             with col3:
                 if st.button("Next Module ➡️"):
-                    st.info("Navigate to next module")
+                    # Find current module index and navigate to next
+                    current_modules = list(modules.keys())
+                    current_idx = current_modules.index(selected_module)
+                    if current_idx < len(current_modules) - 1:
+                        next_module = current_modules[current_idx + 1]
+                        st.session_state.selected_module = next_module
+                        st.rerun()
+                    else:
+                        st.success("🎉 You've completed all modules!")
         else:
             st.error(f"Could not load module: {html_file}")
 
