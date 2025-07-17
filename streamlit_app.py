@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import os
 import base64
 from pathlib import Path
@@ -71,11 +72,60 @@ st.markdown("""
     }
     
     .feature-card {
-        background: #f7fafc;
+        background: var(--background-color);
         padding: 1.5rem;
         border-radius: 10px;
-        border: 2px solid #e2e8f0;
+        border: 2px solid var(--secondary-background-color);
         text-align: center;
+        color: var(--text-color);
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+        .feature-card {
+            background: #1f2937;
+            border: 2px solid #374151;
+            color: #f9fafb;
+        }
+        
+        .module-card {
+            background: #1f2937;
+            color: #f9fafb;
+        }
+        
+        .module-title {
+            color: #f9fafb;
+        }
+        
+        .module-description {
+            color: #d1d5db;
+        }
+    }
+    
+    /* Streamlit dark theme support */
+    .stApp[data-theme="dark"] .feature-card {
+        background: #1f2937;
+        border: 2px solid #374151;
+        color: #f9fafb;
+    }
+    
+    .stApp[data-theme="dark"] .module-card {
+        background: #1f2937;
+        color: #f9fafb;
+    }
+    
+    .stApp[data-theme="dark"] .module-title {
+        color: #f9fafb;
+    }
+    
+    .stApp[data-theme="dark"] .module-description {
+        color: #d1d5db;
     }
     
     .feature-icon {
@@ -117,9 +167,90 @@ def render_html_page(html_content, css_content=None):
         html_content = html_content.replace("</head>", css_injection)
     
     # Use iframe to render HTML
-    st.components.v1.html(html_content, height=800, scrolling=True)
+    components.html(html_content, height=800, scrolling=True)
 
 def main():
+    # Initialize session state for dark mode
+    if 'dark_mode' not in st.session_state:
+        st.session_state.dark_mode = False
+    
+    # Dark mode toggle in sidebar
+    if st.session_state.dark_mode:
+        st.sidebar.markdown('<h1 style="color: #f1f5f9;">🎨 Theme</h1>', unsafe_allow_html=True)
+    else:
+        st.sidebar.title("🎨 Theme")
+    
+    # Current theme indicator
+    current_theme = "🌙 Dark Mode" if st.session_state.dark_mode else "☀️ Light Mode"
+    st.sidebar.markdown(f"**Current Theme:** {current_theme}")
+    
+    # Toggle button
+    toggle_text = "☀️ Switch to Light Mode" if st.session_state.dark_mode else "🌙 Switch to Dark Mode"
+    if st.sidebar.button(toggle_text):
+        st.session_state.dark_mode = not st.session_state.dark_mode
+        st.rerun()
+    
+    # Apply dark mode CSS if enabled
+    if st.session_state.dark_mode:
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+        .main-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        .feature-card {
+            background: #1e293b !important;
+            border: 2px solid #334155 !important;
+            color: #f1f5f9 !important;
+        }
+        .feature-card h3 {
+            color: #f1f5f9 !important;
+        }
+        .feature-card p {
+            color: #cbd5e1 !important;
+        }
+        .module-card {
+            background: #1e293b !important;
+            color: #f1f5f9 !important;
+        }
+        .module-title {
+            color: #f1f5f9 !important;
+        }
+        .module-description {
+            color: #cbd5e1 !important;
+        }
+        .stSidebar {
+            background-color: #1e293b;
+        }
+        .stSidebar > div {
+            background-color: #1e293b;
+        }
+        .stSidebar .stMarkdown {
+            color: #f1f5f9;
+        }
+        .stSidebar .stMarkdown p {
+            color: #f1f5f9;
+        }
+        .stSidebar .stMarkdown h1, 
+        .stSidebar .stMarkdown h2, 
+        .stSidebar .stMarkdown h3 {
+            color: #f1f5f9;
+        }
+        .stSidebar .stMarkdown strong {
+            color: #f1f5f9;
+        }
+        .stSidebar .stMarkdown ul li {
+            color: #cbd5e1;
+        }
+        .stSidebar .stMarkdown ul li::marker {
+            color: #cbd5e1;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    
     # Header
     st.markdown("""
     <div class="main-header">
@@ -129,7 +260,11 @@ def main():
     """, unsafe_allow_html=True)
     
     # Sidebar navigation
-    st.sidebar.title("📚 Navigation")
+    st.sidebar.markdown("---")
+    if st.session_state.dark_mode:
+        st.sidebar.markdown('<h1 style="color: #f1f5f9;">📚 Navigation</h1>', unsafe_allow_html=True)
+    else:
+        st.sidebar.title("📚 Navigation")
     st.sidebar.markdown("---")
     
     # Module selection
@@ -148,7 +283,10 @@ def main():
     
     # Progress tracking
     st.sidebar.markdown("---")
-    st.sidebar.markdown("### 📊 Your Progress")
+    if st.session_state.dark_mode:
+        st.sidebar.markdown('<h3 style="color: #f1f5f9;">📊 Your Progress</h3>', unsafe_allow_html=True)
+    else:
+        st.sidebar.markdown("### 📊 Your Progress")
     
     # Mock progress - in a real app, this would come from user data
     progress_data = {
@@ -163,19 +301,32 @@ def main():
     
     for module, completed in progress_data.items():
         status = "✅ Complete" if completed else "⏳ Available"
-        st.sidebar.markdown(f"**{module}**: {status}")
+        if st.session_state.dark_mode:
+            st.sidebar.markdown(f'<p style="color: #f1f5f9;"><strong>{module}</strong>: {status}</p>', unsafe_allow_html=True)
+        else:
+            st.sidebar.markdown(f"**{module}**: {status}")
     
     # Features section
     st.sidebar.markdown("---")
-    st.sidebar.markdown("### 🌟 Features")
-    st.sidebar.markdown("""
-    - 🎓 **7 Complete Modules**
-    - 🔄 **Restart Anytime**
-    - 📱 **Mobile Friendly**
-    - 🧠 **Interactive Learning**
-    - 📊 **Progress Tracking**
-    - 🎯 **Real Examples**
-    """)
+    if st.session_state.dark_mode:
+        st.sidebar.markdown('<h3 style="color: #f1f5f9;">🌟 Features</h3>', unsafe_allow_html=True)
+    else:
+        st.sidebar.markdown("### 🌟 Features")
+    
+    features_list = [
+        "🎓 **7 Complete Modules**",
+        "🔄 **Restart Anytime**",
+        "📱 **Mobile Friendly**",
+        "🧠 **Interactive Learning**",
+        "📊 **Progress Tracking**",
+        "🎯 **Real Examples**"
+    ]
+    
+    for feature in features_list:
+        if st.session_state.dark_mode:
+            st.sidebar.markdown(f'<p style="color: #cbd5e1;">- {feature}</p>', unsafe_allow_html=True)
+        else:
+            st.sidebar.markdown(f"- {feature}")
     
     # Main content area
     if selected_module == "🏠 Home":
@@ -259,7 +410,7 @@ def main():
             
             with col2:
                 if st.button("🏠 Back to Home"):
-                    st.experimental_rerun()
+                    st.rerun()
             
             with col3:
                 if st.button("Next Module ➡️"):
@@ -269,10 +420,12 @@ def main():
 
     # Footer
     st.markdown("---")
-    st.markdown("""
-    <div style="text-align: center; padding: 2rem; color: #718096;">
+    footer_style = "color: #94a3b8;" if st.session_state.dark_mode else "color: #718096;"
+    st.markdown(f"""
+    <div style="text-align: center; padding: 2rem; {footer_style}">
         <p>🤖 <strong>AI Prompting Mastery</strong> - Your Complete Guide to Effective AI Communication</p>
         <p>Built with ❤️ for learners who want to master AI prompting</p>
+        <p>💡 <em>Tip: Use the theme toggle in the sidebar to switch between light and dark modes!</em></p>
     </div>
     """, unsafe_allow_html=True)
 
