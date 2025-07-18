@@ -55,13 +55,15 @@ st.markdown("""
     }
     
     .status-complete {
-        background: #f0fff4;
+        background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
         color: #38a169;
+        border: 1px solid #9ae6b4;
     }
     
     .status-available {
-        background: #fef5e7;
-        color: #d69e2e;
+        background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+        color: #3182ce;
+        border: 1px solid #90cdf4;
     }
     
     .feature-grid {
@@ -160,11 +162,34 @@ def get_file_content(file_path):
         return None
 
 def render_html_page(html_content, css_content=None):
-    """Render HTML page with embedded CSS"""
+    """Render HTML page with embedded CSS and navigation handling"""
     if css_content:
         # Inject CSS into HTML
         css_injection = f"<style>{css_content}</style></head>"
         html_content = html_content.replace("</head>", css_injection)
+    
+    # Inject JavaScript to handle navigation messages
+    navigation_script = """
+    <script>
+        // Listen for navigation messages from the iframe
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'navigate') {
+                // Set the selected module in Streamlit session state
+                const moduleKey = event.data.module;
+                // This will be handled by the parent Streamlit app
+                console.log('Navigation request:', moduleKey);
+                
+                // We'll use a custom component to handle this
+                window.parent.postMessage({
+                    type: 'streamlit_navigation',
+                    module: moduleKey
+                }, '*');
+            }
+        });
+    </script>
+    </head>
+    """
+    html_content = html_content.replace("</head>", navigation_script)
     
     # Use iframe to render HTML
     components.html(html_content, height=800, scrolling=True)
@@ -301,23 +326,97 @@ def main():
     else:
         st.sidebar.markdown("### 📊 Your Progress")
     
-    # Mock progress - in a real app, this would come from user data
-    progress_data = {
-        "📖 Module 1": True,
-        "💡 Module 2": True,
-        "🏗️ Module 3": False,
-        "🔄 Module 4": False,
-        "🎯 Module 5": False,
-        "🚀 Module 6": False,
-        "⚡ Module 7": False
+    # Initialize progress tracking in session state
+    if 'module_completions' not in st.session_state:
+        st.session_state.module_completions = {}
+    
+    # All modules are available for unlimited retakes
+    modules_info = {
+        "📖 Module 1": "Introduction to AI Prompting",
+        "💡 Module 2": "Understanding Different Types of Prompts", 
+        "🏗️ Module 3": "Advanced Prompt Engineering",
+        "🔄 Module 4": "Iterative Prompt Refinement",
+        "🎯 Module 5": "Context and Chain Prompting",
+        "🚀 Module 6": "AI Integration Strategies",
+        "⚡ Module 7": "Future of AI Prompting"
     }
     
-    for module, completed in progress_data.items():
-        status = "✅ Complete" if completed else "⏳ Available"
-        if st.session_state.dark_mode:
-            st.sidebar.markdown(f'<p style="color: #f1f5f9;"><strong>{module}</strong>: {status}</p>', unsafe_allow_html=True)
+    for module, description in modules_info.items():
+        # Check if module has been completed (but still allow retakes)
+        completion_count = st.session_state.module_completions.get(module, 0)
+        
+        if completion_count > 0:
+            status = f"✅ Completed ({completion_count}x) - Available for retake"
+            status_color = "#38a169"  # Green
         else:
-            st.sidebar.markdown(f"**{module}**: {status}")
+            status = "📚 Available"
+            status_color = "#667eea"  # Blue
+        
+        if st.session_state.dark_mode:
+            st.sidebar.markdown(f'''
+            <div style="
+                background: rgba(255,255,255,0.05);
+                padding: 0.75rem;
+                border-radius: 8px;
+                margin: 0.5rem 0;
+                border-left: 4px solid {status_color};
+            ">
+                <p style="color: #f1f5f9; margin: 0; font-weight: 600;">{module}</p>
+                <p style="color: #cbd5e0; margin: 0.25rem 0 0 0; font-size: 0.85rem;">{description}</p>
+                <p style="color: {status_color}; margin: 0.25rem 0 0 0; font-size: 0.8rem; font-weight: 500;">{status}</p>
+            </div>
+            ''', unsafe_allow_html=True)
+        else:
+            st.sidebar.markdown(f'''
+            <div style="
+                background: #f8fafc;
+                padding: 0.75rem;
+                border-radius: 8px;
+                margin: 0.5rem 0;
+                border-left: 4px solid {status_color};
+                border: 1px solid #e2e8f0;
+            ">
+                <p style="color: #2d3748; margin: 0; font-weight: 600;">{module}</p>
+                <p style="color: #4a5568; margin: 0.25rem 0 0 0; font-size: 0.85rem;">{description}</p>
+                <p style="color: {status_color}; margin: 0.25rem 0 0 0; font-size: 0.8rem; font-weight: 500;">{status}</p>
+            </div>
+            ''', unsafe_allow_html=True)
+    
+    # Overall progress summary
+    st.sidebar.markdown("---")
+    total_modules = len(modules_info)
+    completed_modules = len([m for m in modules_info.keys() if st.session_state.module_completions.get(m, 0) > 0])
+    total_completions = sum(st.session_state.module_completions.values())
+    
+    if st.session_state.dark_mode:
+        st.sidebar.markdown(f'''
+        <div style="
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        ">
+            <h4 style="color: #f1f5f9; margin: 0 0 0.5rem 0;">📊 Overall Progress</h4>
+            <p style="color: #cbd5e0; margin: 0.25rem 0;">Modules Completed: <strong style="color: #38a169;">{completed_modules}/{total_modules}</strong></p>
+            <p style="color: #cbd5e0; margin: 0.25rem 0;">Total Completions: <strong style="color: #667eea;">{total_completions}</strong></p>
+            <p style="color: #cbd5e0; margin: 0.25rem 0; font-size: 0.85rem;">All modules available for unlimited retakes!</p>
+        </div>
+        ''', unsafe_allow_html=True)
+    else:
+        st.sidebar.markdown(f'''
+        <div style="
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        ">
+            <h4 style="color: #2d3748; margin: 0 0 0.5rem 0;">📊 Overall Progress</h4>
+            <p style="color: #4a5568; margin: 0.25rem 0;">Modules Completed: <strong style="color: #38a169;">{completed_modules}/{total_modules}</strong></p>
+            <p style="color: #4a5568; margin: 0.25rem 0;">Total Completions: <strong style="color: #667eea;">{total_completions}</strong></p>
+            <p style="color: #4a5568; margin: 0.25rem 0; font-size: 0.85rem;">All modules available for unlimited retakes!</p>
+        </div>
+        ''', unsafe_allow_html=True)
     
     # Features section
     st.sidebar.markdown("---")
@@ -383,12 +482,23 @@ def main():
         ]
         
         for i, (title, description, icon) in enumerate(module_info, 1):
+            # Get completion count for this module
+            module_key = f"{icon} Module {i}"
+            completion_count = st.session_state.module_completions.get(module_key, 0)
+            
+            if completion_count > 0:
+                status_class = "complete"
+                status_text = f"✅ Completed ({completion_count}x) - Available for retake"
+            else:
+                status_class = "available"
+                status_text = "📚 Available"
+            
             st.markdown(f"""
             <div class="module-card">
                 <div class="module-title">{icon} {title}</div>
                 <div class="module-description">{description}</div>
-                <span class="status-badge status-{'complete' if i <= 2 else 'available'}">
-                    {'✅ Complete' if i <= 2 else '⏳ Available'}
+                <span class="status-badge status-{status_class}">
+                    {status_text}
                 </span>
             </div>
             """, unsafe_allow_html=True)
@@ -457,6 +567,46 @@ def main():
                         st.rerun()
                     else:
                         st.success("🎉 You've completed all modules!")
+            
+            # Module completion section
+            st.markdown("---")
+            st.markdown("### 🎯 Module Completion")
+            
+            # Get current completion count
+            current_completion_count = st.session_state.module_completions.get(selected_module, 0)
+            
+            if current_completion_count > 0:
+                st.success(f"🎉 You've completed this module {current_completion_count} time(s)!")
+                completion_text = f"✅ Complete Again (#{current_completion_count + 1})"
+            else:
+                completion_text = "✅ Mark as Complete"
+            
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                if st.button(completion_text, key=f"complete_{selected_module}"):
+                    # Mark module as complete
+                    if selected_module not in st.session_state.module_completions:
+                        st.session_state.module_completions[selected_module] = 0
+                    st.session_state.module_completions[selected_module] += 1
+                    
+                    new_count = st.session_state.module_completions[selected_module]
+                    st.balloons()
+                    st.success(f"🎉 Congratulations! Module completed for the {new_count} time(s)!")
+                    st.info("💡 Your progress has been saved. You can retake this module anytime!")
+                    st.rerun()
+                
+                # Reset progress button (optional)
+                if current_completion_count > 0:
+                    if st.button("🔄 Reset Progress for This Module", key=f"reset_{selected_module}"):
+                        if st.session_state.get(f"confirm_reset_{selected_module}", False):
+                            st.session_state.module_completions[selected_module] = 0
+                            st.session_state[f"confirm_reset_{selected_module}"] = False
+                            st.success("✅ Progress reset! You can now complete this module again.")
+                            st.rerun()
+                        else:
+                            st.session_state[f"confirm_reset_{selected_module}"] = True
+                            st.warning("⚠️ Click again to confirm reset")
+                            st.rerun()
         else:
             st.error(f"Could not load module: {html_file}")
 
