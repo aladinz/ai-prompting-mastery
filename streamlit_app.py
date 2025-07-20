@@ -88,6 +88,21 @@ st.markdown("""
         box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     }
     
+    /* Full screen iframe styling */
+    iframe {
+        width: 100% !important;
+        min-height: 1200px !important;
+        border: none !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Streamlit component container styling */
+    .stHtml {
+        border-radius: 8px !important;
+        overflow: hidden !important;
+    }
+    
     /* Dark mode support */
     @media (prefers-color-scheme: dark) {
         .feature-card {
@@ -162,13 +177,13 @@ def get_file_content(file_path):
         return None
 
 def render_html_page(html_content, css_content=None):
-    """Render HTML page with embedded CSS and navigation handling"""
+    """Render HTML page with embedded CSS and navigation handling in full screen"""
     if css_content:
         # Inject CSS into HTML
         css_injection = f"<style>{css_content}</style></head>"
         html_content = html_content.replace("</head>", css_injection)
     
-    # Inject JavaScript to handle navigation messages
+    # Inject JavaScript to handle navigation messages and auto-resize
     navigation_script = """
     <script>
         // Listen for navigation messages from the iframe
@@ -186,13 +201,41 @@ def render_html_page(html_content, css_content=None):
                 }, '*');
             }
         });
+        
+        // Auto-resize iframe to content height
+        function resizeIframe() {
+            const height = Math.max(
+                document.body.scrollHeight,
+                document.body.offsetHeight,
+                document.documentElement.clientHeight,
+                document.documentElement.scrollHeight,
+                document.documentElement.offsetHeight,
+                window.innerHeight
+            );
+            
+            window.parent.postMessage({
+                type: 'resize',
+                height: Math.max(height, 1000) // Minimum height of 1000px
+            }, '*');
+        }
+        
+        // Initial resize and on content changes
+        document.addEventListener('DOMContentLoaded', resizeIframe);
+        window.addEventListener('load', resizeIframe);
+        window.addEventListener('resize', resizeIframe);
+        
+        // Observe content changes for dynamic resizing
+        if (window.ResizeObserver) {
+            const resizeObserver = new ResizeObserver(resizeIframe);
+            resizeObserver.observe(document.body);
+        }
     </script>
     </head>
     """
     html_content = html_content.replace("</head>", navigation_script)
     
-    # Use iframe to render HTML
-    components.html(html_content, height=800, scrolling=True)
+    # Use iframe to render HTML with dynamic height (full screen)
+    components.html(html_content, height=1200, scrolling=True)
 
 def main():
     # Initialize session state for dark mode
@@ -528,11 +571,7 @@ def main():
             st.markdown(f"## {selected_module}")
             st.markdown("---")
             
-            # Option to view in full screen
-            if st.button("🔍 View in Full Screen"):
-                st.info("💡 **Tip**: Click the expand button in the top-right of the module viewer for a better experience!")
-            
-            # Render the HTML page
+            # Render the HTML page in full screen mode
             render_html_page(html_content, css_content)
             
             # Module navigation
