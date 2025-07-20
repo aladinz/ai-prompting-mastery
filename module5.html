@@ -499,39 +499,113 @@
     }
 
     .comparison-card {
-      padding: 1.5rem;
-      border-radius: 8px;
+      padding: 2rem;
+      border-radius: 16px;
       position: relative;
+      transition: all 0.4s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .comparison-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .comparison-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+    }
+
+    .comparison-card:hover::before {
+      height: 8px;
     }
 
     .comparison-card.vague {
-      background: #fef2f2;
-      border-left: 4px solid #ef4444;
+      background: linear-gradient(135deg, #fef2f2, #fee2e2);
+      border: 1px solid #fecaca;
+    }
+
+    .comparison-card.vague::before {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
     }
 
     .comparison-card.specific {
-      background: #f0fdf4;
-      border-left: 4px solid #22c55e;
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border: 1px solid #bbf7d0;
+    }
+
+    .comparison-card.specific::before {
+      background: linear-gradient(90deg, #22c55e, #16a34a);
     }
 
     .comparison-label {
       position: absolute;
-      top: -0.5rem;
-      left: 1rem;
-      padding: 0.3rem 0.8rem;
-      border-radius: 15px;
-      font-weight: 600;
-      font-size: 0.8rem;
+      top: -0.8rem;
+      left: 1.5rem;
+      padding: 0.5rem 1.2rem;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      backdrop-filter: blur(10px);
     }
 
     .comparison-card.vague .comparison-label {
-      background: #ef4444;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
       color: white;
     }
 
     .comparison-card.specific .comparison-label {
-      background: #22c55e;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
       color: white;
+    }
+
+    .comparison-card h4 {
+      margin: 1rem 0 1.5rem 0;
+      color: #374151;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .comparison-card .prompt-example {
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      border: 2px solid transparent;
+      position: relative;
+      backdrop-filter: blur(5px);
+    }
+
+    .comparison-card.vague .prompt-example {
+      border-color: rgba(239, 68, 68, 0.3);
+      background: rgba(254, 242, 242, 0.8);
+    }
+
+    .comparison-card.specific .prompt-example {
+      border-color: rgba(34, 197, 94, 0.3);
+      background: rgba(240, 253, 244, 0.8);
+    }
+
+    .comparison-card p {
+      margin: 1rem 0 0 0;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    .comparison-card strong {
+      color: #1f2937;
+      font-weight: 700;
     }
 
     .quiz-section {
@@ -756,18 +830,93 @@
     }
 
     /* Dark Mode Support */
+    .dark-mode {
+      --card-dark: #1f2937;
+      --light-bg-dark: #374151;
+      --border-dark: #4b5563;
+      --text-dark: #f9fafb;
+      --accent-dark: #6366f1;
+    }
+
+    .dark-mode body {
+      background: #111827;
+      color: #f9fafb;
+    }
+
     .dark-mode .module-header {
-      background: linear-gradient(135deg, var(--accent-dark, #2d2a6c), #1e1b4f);
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
     }
 
     .dark-mode .progress-wrapper {
-      background: var(--card-dark, #1a1a1a);
-      border-color: var(--border-dark, #333);
+      background: #1f2937;
+      border-color: #4b5563;
     }
 
     .dark-mode .step {
-      background: var(--light-bg-dark, #333);
-      color: var(--text-dark, #ccc);
+      background: #374151;
+      color: #d1d5db;
+    }
+
+    /* Dark mode comparison cards */
+    .dark-mode .comparison-card {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .dark-mode .comparison-card:hover {
+      box-shadow: 0 12px 35px rgba(0,0,0,0.5);
+    }
+
+    .dark-mode .comparison-card.vague {
+      background: linear-gradient(135deg, #7f1d1d, #991b1b);
+      border-color: #dc2626;
+    }
+
+    .dark-mode .comparison-card.vague::before {
+      background: linear-gradient(90deg, #ef4444, #f87171);
+    }
+
+    .dark-mode .comparison-card.specific {
+      background: linear-gradient(135deg, #14532d, #166534);
+      border-color: #16a34a;
+    }
+
+    .dark-mode .comparison-card.specific::before {
+      background: linear-gradient(90deg, #22c55e, #4ade80);
+    }
+
+    .dark-mode .comparison-card h4 {
+      color: #f9fafb;
+    }
+
+    .dark-mode .comparison-card p {
+      color: #d1d5db;
+    }
+
+    .dark-mode .comparison-card strong {
+      color: #f9fafb;
+    }
+
+    .dark-mode .comparison-card.vague .prompt-example {
+      background: rgba(127, 29, 29, 0.8);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fecaca;
+    }
+
+    .dark-mode .comparison-card.specific .prompt-example {
+      background: rgba(20, 83, 45, 0.8);
+      border-color: rgba(34, 197, 94, 0.5);
+      color: #bbf7d0;
+    }
+
+    /* Keep labels vibrant in dark mode */
+    .dark-mode .comparison-card.vague .comparison-label {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
+
+    .dark-mode .comparison-card.specific .comparison-label {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
     }
 
     .dark-mode .table-of-contents,

@@ -659,37 +659,305 @@
     }
 
     /* Dark Mode Support */
+    .dark-mode {
+      --card: #1f2937;
+      --card-dark: #1f2937;
+      --light-bg: #374151;
+      --light-bg-dark: #374151;
+      --border: #4b5563;
+      --border-dark: #4b5563;
+      --text: #f9fafb;
+      --text-dark: #f9fafb;
+      --accent: #6366f1;
+      --accent-dark: #6366f1;
+      --accent-light: rgba(99, 102, 241, 0.1);
+      --success: #10b981;
+      --success-light: rgba(16, 185, 129, 0.1);
+      --success-dark: #059669;
+      --error: #ef4444;
+      --error-light: rgba(239, 68, 68, 0.1);
+      --error-dark: #dc2626;
+    }
+
+    .dark-mode body {
+      background: #111827;
+      color: #f9fafb;
+    }
+
     .dark-mode .module-header {
-      background: linear-gradient(135deg, var(--accent-dark, #2d2a6c), #1e1b4f);
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
     }
 
     .dark-mode .progress-wrapper {
-      background: var(--card-dark, #1a1a1a);
-      border-color: var(--border-dark, #333);
+      background: #1f2937;
+      border-color: #4b5563;
     }
 
     .dark-mode .step {
-      background: var(--light-bg-dark, #333);
-      color: var(--text-dark, #ccc);
+      background: #374151;
+      color: #d1d5db;
+    }
+
+    .dark-mode .step.active {
+      background: #6366f1;
+      color: white;
+    }
+
+    .dark-mode .step.completed {
+      background: #10b981;
+      color: white;
+    }
+
+    .dark-mode .table-of-contents {
+      background: #1f2937;
+      border-color: #4b5563;
+    }
+
+    .dark-mode .table-of-contents h3 {
+      color: #6366f1;
+    }
+
+    .dark-mode .toc-list li {
+      background: #374151;
+      border-left-color: #6366f1;
+    }
+
+    .dark-mode .toc-list a {
+      color: #f9fafb;
+    }
+
+    .dark-mode .section h2 {
+      color: #6366f1;
+      border-bottom-color: #4b5563;
+    }
+
+    .dark-mode .overview-card {
+      background: #1f2937;
+      border-color: #4b5563;
+    }
+
+    .dark-mode .overview-card h3 {
+      color: #6366f1;
+    }
+
+    .dark-mode .overview-card p {
+      color: #d1d5db;
+    }
+
+    .dark-mode .prompt-example {
+      background: #374151;
+      border-color: #4b5563;
+    }
+
+    .dark-mode .prompt-example h4 {
+      color: #6366f1;
     }
 
     .dark-mode .prompt-text {
-      background: var(--card-dark, #1e1e1e);
-      color: var(--text-dark, #dcdcdc);
+      background: #1f2937;
+      border-left-color: #6366f1;
+      color: #e5e7eb;
+    }
+
+    .dark-mode .copy-button {
+      background: #6366f1;
+    }
+
+    .dark-mode .copy-button:hover {
+      background: #4f46e5;
+    }
+
+    .dark-mode .breakdown-item {
+      background: #1f2937;
+      border-color: #4b5563;
+    }
+
+    .dark-mode .breakdown-item .label {
+      color: #6366f1;
+    }
+
+    .dark-mode .breakdown-item p {
+      color: #d1d5db;
+    }
+
+    .dark-mode .prompt-builder {
+      background: #1f2937;
+      border-color: #4b5563;
+    }
+
+    .dark-mode .form-group label {
+      color: #f9fafb;
+    }
+
+    .dark-mode .form-group input,
+    .dark-mode .form-group textarea {
+      background: #374151;
+      border-color: #4b5563;
+      color: #f9fafb;
+    }
+
+    .dark-mode .form-group input:focus,
+    .dark-mode .form-group textarea:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .dark-mode .form-group small {
+      color: #9ca3af;
     }
 
     .dark-mode .generated-prompt {
-      background: var(--light-bg-dark, #1e1e1e);
-      border-color: var(--accent-dark, #6366f1);
-      color: var(--text-dark, #e2e8f0);
+      background: #374151;
+      border-color: #6366f1;
+      color: #f9fafb;
+    }
+
+    .dark-mode .example-card {
+      background: #1f2937;
+      border-color: #4b5563;
+    }
+
+    .dark-mode .example-card h4 {
+      color: #f9fafb;
+    }
+
+    .dark-mode .example-card p {
+      color: #d1d5db;
+    }
+
+    .dark-mode .quiz-section {
+      background: #1f2937;
+      border-color: #4b5563;
+    }
+
+    .dark-mode .quiz-card {
+      background: #374151;
+      border-color: #4b5563;
+    }
+
+    .dark-mode .quiz-card h4 {
+      color: #f9fafb;
+    }
+
+    .dark-mode .quiz-card p {
+      color: #d1d5db;
+    }
+
+    .dark-mode .quiz-option {
+      background: #1f2937;
+      border-color: #4b5563;
+      color: #f9fafb;
     }
 
     .dark-mode .quiz-option:hover {
-      background: var(--accent-dark-light, #1e1b4f);
+      border-color: #6366f1;
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .dark-mode .quiz-option.selected {
+      border-color: #6366f1;
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .dark-mode .quiz-option.correct {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .dark-mode .quiz-option.incorrect {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .dark-mode .feedback.correct {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+      border-left-color: #10b981;
+    }
+
+    .dark-mode .feedback.incorrect {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border-left-color: #ef4444;
     }
 
     .dark-mode .cheat-sheet {
-      background: linear-gradient(135deg, var(--accent-dark, #2d2a6c), #1e1b4f);
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+    }
+
+    .dark-mode .cheat-item {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .dark-mode .completion-section {
+      background: #1f2937;
+      border-color: #4b5563;
+    }
+
+    .dark-mode .completion-section h2 {
+      color: #f9fafb;
+    }
+
+    .dark-mode .completion-section p {
+      color: #d1d5db;
+    }
+
+    .dark-mode .completion-section.completed {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+
+    .dark-mode .btn {
+      background: #6366f1;
+    }
+
+    .dark-mode .btn:hover {
+      background: #4f46e5;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .dark-mode .btn.secondary {
+      background: #1f2937;
+      color: #6366f1;
+      border-color: #6366f1;
+    }
+
+    .dark-mode .btn.secondary:hover {
+      background: #6366f1;
+      color: white;
+    }
+
+    .dark-mode .navigation {
+      border-top-color: #4b5563;
+    }
+
+    .dark-mode .nav-link {
+      color: #6366f1;
+    }
+
+    .dark-mode .nav-link:hover {
+      color: #4f46e5;
+    }
+
+    /* Dark mode text and paragraph adjustments */
+    .dark-mode p {
+      color: #d1d5db;
+    }
+
+    .dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode h4, .dark-mode h5, .dark-mode h6 {
+      color: #f9fafb;
+    }
+
+    .dark-mode .section h2 {
+      color: #6366f1;
+    }
+
+    .dark-mode strong {
+      color: #f9fafb;
+    }
+
+    .dark-mode .module-content {
+      color: #d1d5db;
     }
   </style>
 </head>
