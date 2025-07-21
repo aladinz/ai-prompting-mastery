@@ -715,7 +715,7 @@
   <footer class="module-footer">
     <div class="footer-navigation">
       <button onclick="navigateToHome()" class="nav-button nav-back">← Back to Home</button>
-      <button onclick="alert('Button works!'); console.log('Button clicked');" class="nav-button nav-next">Next Module ➡️</button>
+      <button onclick="alert('Button works!'); console.log('Button clicked');" class="nav-button nav-next" style="background: red !important; color: white !important; border: 3px solid yellow !important; z-index: 9999 !important; position: relative !important;">Next Module ➡️ TEST</button>
     </div>
   </footer>
 
@@ -958,6 +958,20 @@
     function testButton() {
       alert('Button clicked! Function is working.');
     }
+    
+    // Test button accessibility on page load
+    window.addEventListener('DOMContentLoaded', function() {
+      console.log('Page loaded, testing button...');
+      const buttons = document.querySelectorAll('.nav-next');
+      console.log('Found buttons:', buttons.length);
+      if (buttons.length > 0) {
+        console.log('Button found:', buttons[0]);
+        console.log('Button onclick:', buttons[0].onclick);
+        console.log('Button style display:', window.getComputedStyle(buttons[0]).display);
+        console.log('Button style visibility:', window.getComputedStyle(buttons[0]).visibility);
+        console.log('Button style pointerEvents:', window.getComputedStyle(buttons[0]).pointerEvents);
+      }
+    });
     
     function navigateToHome() {
       // Check if we're in a Streamlit iframe
