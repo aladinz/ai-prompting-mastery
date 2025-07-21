@@ -371,6 +371,9 @@
       text-decoration: none;
       display: inline-block;
       font-family: inherit;
+      position: relative;
+      z-index: 1000;
+      pointer-events: auto;
     }
 
     .nav-button:hover {
@@ -712,7 +715,7 @@
   <footer class="module-footer">
     <div class="footer-navigation">
       <button onclick="navigateToHome()" class="nav-button nav-back">← Back to Home</button>
-      <button onclick="testButton(); navigateToModule2()" class="nav-button nav-next">Next Module ➡️</button>
+      <button onclick="alert('Button works!'); console.log('Button clicked');" class="nav-button nav-next">Next Module ➡️</button>
     </div>
   </footer>
 
