@@ -712,7 +712,7 @@
   <footer class="module-footer">
     <div class="footer-navigation">
       <button onclick="navigateToHome()" class="nav-button nav-back">← Back to Home</button>
-      <button onclick="navigateToModule2(); this.style.transform='scale(0.95)'; setTimeout(() => this.style.transform='scale(1)', 150);" class="nav-button nav-next">Next Module ➡️</button>
+      <button onclick="navigateToModule2()" class="nav-button nav-next">Next Module ➡️</button>
     </div>
   </footer>
 
@@ -955,15 +955,13 @@
     function navigateToHome() {
       // Check if we're in a Streamlit iframe
       if (window.parent !== window) {
-        // We're in an iframe, try to communicate with parent
+        // We're in an iframe, use query parameter navigation for more reliable results
         try {
-          window.parent.postMessage({
-            type: 'streamlit_navigation',
-            module: '🏠 Home'
-          }, '*');
-          console.log('Sent navigation request to Home');
+          // Navigate using query parameters which trigger Streamlit rerun
+          window.top.location.href = window.top.location.origin + window.top.location.pathname + '?nav_to=' + encodeURIComponent('🏠 Home');
+          console.log('Navigating via query parameter to Home');
         } catch (error) {
-          console.log('Parent communication failed, falling back to direct navigation');
+          console.log('Query parameter navigation failed, falling back to direct navigation', error);
           window.top.location.href = 'index.html';
         }
       } else {
@@ -977,17 +975,13 @@
       // Check if we're in a Streamlit iframe
       if (window.parent !== window) {
         console.log('Detected iframe environment');
-        // We're in an iframe, try to communicate with parent
+        // We're in an iframe, use query parameter navigation for more reliable results
         try {
-          window.parent.postMessage({
-            type: 'streamlit_navigation',
-            module: '💡 Module 2: Types of Prompts'
-          }, '*');
-          console.log('Sent navigation request to Module 2');
-          // Visual feedback for user
-          alert('Navigation request sent to Module 2');
+          // Navigate using query parameters which trigger Streamlit rerun
+          window.top.location.href = window.top.location.origin + window.top.location.pathname + '?nav_to=' + encodeURIComponent('💡 Module 2: Types of Prompts');
+          console.log('Navigating via query parameter to Module 2');
         } catch (error) {
-          console.log('Parent communication failed, falling back to direct navigation', error);
+          console.log('Query parameter navigation failed, falling back to direct navigation', error);
           window.top.location.href = 'module2.html';
         }
       } else {
