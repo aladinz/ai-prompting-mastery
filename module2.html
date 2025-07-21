@@ -44,6 +44,10 @@
     }
 
     /* Base styles */
+    html {
+      scroll-behavior: smooth;
+    }
+    
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg-secondary);
@@ -262,6 +266,8 @@
       border: 1px solid var(--border-color);
       position: relative;
       overflow: hidden;
+      cursor: pointer;
+      user-select: none;
     }
 
     .toc-item::before {
@@ -1301,30 +1307,30 @@
         <span>Table of Contents</span>
       </div>
       <div class="toc-grid">
-        <a href="#overview" class="toc-item" onclick="scrollToSection('overview')">
+        <div class="toc-item" onclick="scrollToSection('overview')" style="cursor: pointer;">
           <span class="toc-icon">📖</span>
           <span>Overview & Key Insights</span>
-        </a>
-        <a href="#informational" class="toc-item" onclick="scrollToSection('informational')">
+        </div>
+        <div class="toc-item" onclick="scrollToSection('informational')" style="cursor: pointer;">
           <span class="toc-icon">🧠</span>
           <span>Informational Prompts</span>
-        </a>
-        <a href="#creative" class="toc-item" onclick="scrollToSection('creative')">
+        </div>
+        <div class="toc-item" onclick="scrollToSection('creative')" style="cursor: pointer;">
           <span class="toc-icon">🎨</span>
           <span>Creative Prompts</span>
-        </a>
-        <a href="#instructional" class="toc-item" onclick="scrollToSection('instructional')">
+        </div>
+        <div class="toc-item" onclick="scrollToSection('instructional')" style="cursor: pointer;">
           <span class="toc-icon">🛠️</span>
           <span>Instructional Prompts</span>
-        </a>
-        <a href="#conversational" class="toc-item" onclick="scrollToSection('conversational')">
+        </div>
+        <div class="toc-item" onclick="scrollToSection('conversational')" style="cursor: pointer;">
           <span class="toc-icon">💬</span>
           <span>Conversational Prompts</span>
-        </a>
-        <a href="#analytical" class="toc-item" onclick="scrollToSection('analytical')">
+        </div>
+        <div class="toc-item" onclick="scrollToSection('analytical')" style="cursor: pointer;">
           <span class="toc-icon">📊</span>
           <span>Analytical Prompts</span>
-        </a>
+        </div>
       </div>
     </div>
 
@@ -1698,14 +1704,14 @@
     </section>
 
     <section class="next-module">
-      <a href="module3.html" class="cta-button">➡️ Go to Module 3</a>
+      <button onclick="navigateToModule3()" class="cta-button">➡️ Go to Module 3</button>
     </section>
   </main>
 
   <footer class="module-footer">
-    <a href="module1.html" class="module-nav-btn">← Previous Module</a>
-    <a href="index.html" class="module-nav-btn">🏠 Home</a>
-    <a href="module3.html" class="module-nav-btn">Next Module ➡️</a>
+    <button onclick="navigateToModule1()" class="module-nav-btn">← Previous Module</button>
+    <button onclick="navigateToHome()" class="module-nav-btn">🏠 Home</button>
+    <button onclick="navigateToModule3()" class="module-nav-btn">Next Module ➡️</button>
   </footer>
 
   <script>
@@ -1821,12 +1827,32 @@
       currentStep.textContent = completedSteps;
     }
     
-    // Smooth scrolling for navigation
+    // Smooth scrolling for navigation - Enhanced for Streamlit compatibility
     function scrollToSection(sectionId) {
-      document.getElementById(sectionId).scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
+      console.log('Scrolling to section:', sectionId);
+      const element = document.getElementById(sectionId);
+      if (element) {
+        // For iframe compatibility, use a more robust scrolling approach
+        try {
+          element.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start',
+            inline: 'nearest'
+          });
+          
+          // Optional: Add a small delay to ensure scrolling completes
+          setTimeout(() => {
+            console.log('Scroll completed for:', sectionId);
+          }, 500);
+          
+        } catch (error) {
+          console.error('Error scrolling to section:', error);
+          // Fallback: use traditional scroll
+          element.scrollTop = element.offsetTop;
+        }
+      } else {
+        console.error('Element not found:', sectionId);
+      }
     }
     
     // Fade-in animation on scroll
@@ -1962,6 +1988,67 @@
     
     // Handle scroll events for animations
     window.addEventListener('scroll', handleScrollAnimations);
+
+    // Navigation functions for Streamlit compatibility
+    function navigateToHome() {
+      // Check if we're in a Streamlit iframe
+      if (window.parent !== window) {
+        // We're in an iframe, try to communicate with parent
+        try {
+          window.parent.postMessage({
+            type: 'streamlit_navigation',
+            module: '🏠 Home'
+          }, '*');
+          console.log('Sent navigation request to Home');
+        } catch (error) {
+          console.log('Parent communication failed, falling back to direct navigation');
+          window.top.location.href = 'index.html';
+        }
+      } else {
+        // Direct navigation for standalone HTML
+        window.location.href = 'index.html';
+      }
+    }
+
+    function navigateToModule1() {
+      // Check if we're in a Streamlit iframe
+      if (window.parent !== window) {
+        // We're in an iframe, try to communicate with parent
+        try {
+          window.parent.postMessage({
+            type: 'streamlit_navigation',
+            module: '📖 Module 1: Getting Started'
+          }, '*');
+          console.log('Sent navigation request to Module 1');
+        } catch (error) {
+          console.log('Parent communication failed, falling back to direct navigation');
+          window.top.location.href = 'module1.html';
+        }
+      } else {
+        // Direct navigation for standalone HTML
+        window.location.href = 'module1.html';
+      }
+    }
+
+    function navigateToModule3() {
+      // Check if we're in a Streamlit iframe
+      if (window.parent !== window) {
+        // We're in an iframe, try to communicate with parent
+        try {
+          window.parent.postMessage({
+            type: 'streamlit_navigation',
+            module: '🏗️ Module 3: Building Better Prompts'
+          }, '*');
+          console.log('Sent navigation request to Module 3');
+        } catch (error) {
+          console.log('Parent communication failed, falling back to direct navigation');
+          window.top.location.href = 'module3.html';
+        }
+      } else {
+        // Direct navigation for standalone HTML
+        window.location.href = 'module3.html';
+      }
+    }
   </script>
 </body>
 </html>
