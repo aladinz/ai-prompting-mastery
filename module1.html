@@ -357,6 +357,47 @@
       border-top-color: var(--light-bg-dark, #374151);
     }
 
+    /* Navigation button styling */
+    .nav-button {
+      background: none;
+      border: 2px solid var(--accent, #4a47a3);
+      color: var(--accent, #4a47a3);
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      font-family: inherit;
+    }
+
+    .nav-button:hover {
+      background: var(--accent, #4a47a3);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(74, 71, 163, 0.3);
+    }
+
+    .nav-button:active {
+      transform: translateY(0);
+    }
+
+    /* Dark mode navigation buttons */
+    .dark-mode .nav-button,
+    html.dark-mode .nav-button {
+      border-color: var(--accent-dark, #6366f1);
+      color: var(--accent-dark, #6366f1);
+    }
+
+    .dark-mode .nav-button:hover,
+    html.dark-mode .nav-button:hover {
+      background: var(--accent-dark, #6366f1);
+      color: white;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
     @media print {
       .cheat-sheet, .module-footer, .progress-bar, .complete, .module-progress, .table-of-contents {
         display: none !important;
@@ -670,8 +711,8 @@
 
   <footer class="module-footer">
     <div class="footer-navigation">
-      <a href="index.html" class="nav-button nav-back">← Back to Home</a>
-      <a href="module2.html" class="nav-button nav-next">Next Module ➡️</a>
+      <button onclick="navigateToHome()" class="nav-button nav-back">← Back to Home</button>
+      <button onclick="navigateToModule2()" class="nav-button nav-next">Next Module ➡️</button>
     </div>
   </footer>
 
@@ -908,6 +949,47 @@
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+    }
+
+    // Navigation functions for Streamlit compatibility
+    function navigateToHome() {
+      // Check if we're in a Streamlit iframe
+      if (window.parent !== window) {
+        // We're in an iframe, try to communicate with parent
+        try {
+          window.parent.postMessage({
+            type: 'streamlit_navigation',
+            module: '🏠 Home'
+          }, '*');
+          console.log('Sent navigation request to Home');
+        } catch (error) {
+          console.log('Parent communication failed, falling back to direct navigation');
+          window.top.location.href = 'index.html';
+        }
+      } else {
+        // Direct navigation for standalone HTML
+        window.location.href = 'index.html';
+      }
+    }
+
+    function navigateToModule2() {
+      // Check if we're in a Streamlit iframe
+      if (window.parent !== window) {
+        // We're in an iframe, try to communicate with parent
+        try {
+          window.parent.postMessage({
+            type: 'streamlit_navigation',
+            module: '💡 Module 2: Types of Prompts'
+          }, '*');
+          console.log('Sent navigation request to Module 2');
+        } catch (error) {
+          console.log('Parent communication failed, falling back to direct navigation');
+          window.top.location.href = 'module2.html';
+        }
+      } else {
+        // Direct navigation for standalone HTML
+        window.location.href = 'module2.html';
+      }
     }
   </script>
 </body>

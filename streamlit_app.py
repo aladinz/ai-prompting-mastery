@@ -186,19 +186,26 @@ def render_html_page(html_content, css_content=None):
     # Inject JavaScript to handle navigation messages and auto-resize
     navigation_script = """
     <script>
-        // Listen for navigation messages from the iframe
+        // Listen for navigation messages from the iframe content
         window.addEventListener('message', function(event) {
-            if (event.data.type === 'navigate') {
-                // Set the selected module in Streamlit session state
-                const moduleKey = event.data.module;
-                // This will be handled by the parent Streamlit app
-                console.log('Navigation request:', moduleKey);
+            if (event.data.type === 'streamlit_navigation') {
+                // Store the navigation target in a way Streamlit can access
+                const moduleTarget = event.data.module;
+                console.log('Received navigation request for:', moduleTarget);
                 
-                // We'll use a custom component to handle this
-                window.parent.postMessage({
-                    type: 'streamlit_navigation',
-                    module: moduleKey
-                }, '*');
+                // Create a temporary element to store the navigation target
+                // This will be picked up by the Streamlit app
+                const navElement = document.createElement('div');
+                navElement.id = 'navigation-target';
+                navElement.setAttribute('data-module', moduleTarget);
+                navElement.style.display = 'none';
+                document.body.appendChild(navElement);
+                
+                // Trigger a Streamlit rerun by dispatching a custom event
+                const event_detail = new CustomEvent('streamlit_navigate', {
+                    detail: { module: moduleTarget }
+                });
+                window.dispatchEvent(event_detail);
             }
         });
         
@@ -241,6 +248,18 @@ def main():
     # Initialize session state for dark mode
     if 'dark_mode' not in st.session_state:
         st.session_state.dark_mode = False
+    
+    # Check for navigation requests from query parameters
+    query_params = st.query_params
+    if 'nav_to' in query_params:
+        target_module = query_params['nav_to']
+        # Clear the query parameter to prevent loops
+        st.query_params.clear()
+        # Set the target module in session state
+        if 'selected_module' not in st.session_state:
+            st.session_state.selected_module = "🏠 Home"
+        st.session_state.selected_module = target_module
+        st.rerun()
     
     # Dark mode toggle in sidebar
     if st.session_state.dark_mode:
@@ -318,6 +337,31 @@ def main():
         }
         </style>
         """, unsafe_allow_html=True)
+    
+    # Add navigation handling JavaScript
+    st.markdown("""
+    <script>
+        // Listen for navigation messages from iframes
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'streamlit_navigation') {
+                console.log('Streamlit received navigation request:', event.data.module);
+                
+                // Store the navigation target
+                window.navigationTarget = event.data.module;
+                
+                // Trigger Streamlit to check for navigation changes
+                // We'll use the query parameters to trigger a rerun
+                const url = new URL(window.location);
+                url.searchParams.set('nav_to', encodeURIComponent(event.data.module));
+                url.searchParams.set('nav_time', Date.now());
+                window.history.pushState({}, '', url);
+                
+                // Force a page refresh to trigger Streamlit navigation
+                window.location.reload();
+            }
+        });
+    </script>
+    """, unsafe_allow_html=True)
     
     # Header
     st.markdown("""
