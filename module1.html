@@ -6,6 +6,11 @@
   <title>Module 1: What Is Prompt Engineering?</title>
   <link rel="stylesheet" href="module1.css" />
   <style>
+    /* Smooth scrolling for the entire document */
+    html {
+      scroll-behavior: smooth;
+    }
+    
     /* Module Progress Indicator */
     .module-progress {
       position: sticky;
@@ -82,12 +87,21 @@
       color: white;
       transition: all 0.3s ease;
       border: 1px solid rgba(255,255,255,0.2);
+      cursor: pointer;
+      user-select: none;
+      display: block;
+      text-align: center;
     }
 
     .toc-item:hover {
       background: rgba(255,255,255,0.2);
       transform: translateY(-3px);
       box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    .toc-item:active {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.3);
     }
 
     /* Copy to Clipboard functionality */
@@ -402,11 +416,11 @@
     <h2>📚 Navigate This Module</h2>
     <p>Master the fundamentals of prompt engineering step by step</p>
     <div class="toc-grid">
-      <a href="#key-insights" class="toc-item">🔑 Key Insights</a>
-      <a href="#why-it-matters" class="toc-item">🌟 Why It Matters</a>
-      <a href="#definition" class="toc-item">🎯 Definition</a>
-      <a href="#framework" class="toc-item">🛠️ Framework</a>
-      <a href="#examples" class="toc-item">📝 Examples</a>
+      <div class="toc-item" onclick="scrollToSection('key-insights')" style="cursor: pointer;">🔑 Key Insights</div>
+      <div class="toc-item" onclick="scrollToSection('why-it-matters')" style="cursor: pointer;">🌟 Why It Matters</div>
+      <div class="toc-item" onclick="scrollToSection('definition')" style="cursor: pointer;">🎯 Definition</div>
+      <div class="toc-item" onclick="scrollToSection('framework')" style="cursor: pointer;">🛠️ Framework</div>
+      <div class="toc-item" onclick="scrollToSection('examples')" style="cursor: pointer;">📝 Examples</div>
     </div>
   </section>
 
@@ -678,15 +692,33 @@
 
     // Smooth scrolling to sections
     function scrollToSection(sectionId) {
+      console.log('Scrolling to section:', sectionId);
       const element = document.getElementById(sectionId);
       if (element) {
-        element.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start' 
-        });
-        
-        // Update progress steps
-        updateProgressSteps(sectionId);
+        // For iframe compatibility, use a more robust scrolling approach
+        try {
+          element.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start',
+            inline: 'nearest'
+          });
+          
+          // Update progress steps
+          updateProgressSteps(sectionId);
+          
+          // Optional: Add a small delay to ensure scrolling completes
+          setTimeout(() => {
+            console.log('Scroll completed for:', sectionId);
+          }, 500);
+          
+        } catch (error) {
+          console.error('Error scrolling to section:', error);
+          // Fallback: use traditional scroll
+          element.scrollTop = element.offsetTop;
+          updateProgressSteps(sectionId);
+        }
+      } else {
+        console.error('Element not found:', sectionId);
       }
     }
 
