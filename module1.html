@@ -712,7 +712,7 @@
   <footer class="module-footer">
     <div class="footer-navigation">
       <button onclick="navigateToHome()" class="nav-button nav-back">← Back to Home</button>
-      <button onclick="navigateToModule2()" class="nav-button nav-next">Next Module ➡️</button>
+      <button onclick="testButton(); navigateToModule2()" class="nav-button nav-next">Next Module ➡️</button>
     </div>
   </footer>
 
@@ -952,6 +952,10 @@
     }
 
     // Navigation functions for Streamlit compatibility
+    function testButton() {
+      alert('Button clicked! Function is working.');
+    }
+    
     function navigateToHome() {
       // Check if we're in a Streamlit iframe
       if (window.parent !== window) {
@@ -972,20 +976,29 @@
 
     function navigateToModule2() {
       console.log('navigateToModule2() function called');
+      alert('Function called. Checking environment...');
+      
       // Check if we're in a Streamlit iframe
       if (window.parent !== window) {
         console.log('Detected iframe environment');
+        alert('Iframe detected. Attempting navigation...');
+        
         // We're in an iframe, use query parameter navigation for more reliable results
         try {
           // Navigate using query parameters which trigger Streamlit rerun
-          window.top.location.href = window.top.location.origin + window.top.location.pathname + '?nav_to=' + encodeURIComponent('💡 Module 2: Types of Prompts');
+          const targetURL = window.top.location.origin + window.top.location.pathname + '?nav_to=' + encodeURIComponent('💡 Module 2: Types of Prompts');
+          console.log('Target URL:', targetURL);
+          alert('Navigating to: ' + targetURL);
+          window.top.location.href = targetURL;
           console.log('Navigating via query parameter to Module 2');
         } catch (error) {
           console.log('Query parameter navigation failed, falling back to direct navigation', error);
+          alert('Error occurred: ' + error.message + '. Trying fallback...');
           window.top.location.href = 'module2.html';
         }
       } else {
         console.log('Detected standalone environment, direct navigation');
+        alert('Standalone mode detected. Direct navigation to module2.html');
         // Direct navigation for standalone HTML
         window.location.href = 'module2.html';
       }
