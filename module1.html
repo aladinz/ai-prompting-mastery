@@ -390,7 +390,8 @@
   <div class="module-progress">
     <div class="progress-steps">
       <div class="progress-step completed" onclick="scrollToSection('key-insights')">🔑 Key Insights</div>
-      <div class="progress-step active" onclick="scrollToSection('definition')">🎯 Definition</div>
+      <div class="progress-step active" onclick="scrollToSection('why-it-matters')">🌟 Why It Matters</div>
+      <div class="progress-step" onclick="scrollToSection('definition')">🎯 Definition</div>
       <div class="progress-step" onclick="scrollToSection('framework')">🛠️ Framework</div>
       <div class="progress-step" onclick="scrollToSection('examples')">📝 Examples</div>
     </div>
@@ -402,6 +403,7 @@
     <p>Master the fundamentals of prompt engineering step by step</p>
     <div class="toc-grid">
       <a href="#key-insights" class="toc-item">🔑 Key Insights</a>
+      <a href="#why-it-matters" class="toc-item">🌟 Why It Matters</a>
       <a href="#definition" class="toc-item">🎯 Definition</a>
       <a href="#framework" class="toc-item">🛠️ Framework</a>
       <a href="#examples" class="toc-item">📝 Examples</a>
@@ -691,7 +693,7 @@
     // Update progress step states
     function updateProgressSteps(currentSection) {
       const steps = document.querySelectorAll('.progress-step');
-      const sections = ['key-insights', 'definition', 'framework', 'examples'];
+      const sections = ['key-insights', 'why-it-matters', 'definition', 'framework', 'examples'];
       const currentIndex = sections.indexOf(currentSection);
       
       steps.forEach((step, index) => {
