@@ -712,7 +712,7 @@
   <footer class="module-footer">
     <div class="footer-navigation">
       <button onclick="navigateToHome()" class="nav-button nav-back">← Back to Home</button>
-      <button onclick="navigateToModule2()" class="nav-button nav-next">Next Module ➡️</button>
+      <button onclick="navigateToModule2(); this.style.transform='scale(0.95)'; setTimeout(() => this.style.transform='scale(1)', 150);" class="nav-button nav-next">Next Module ➡️</button>
     </div>
   </footer>
 
@@ -973,8 +973,10 @@
     }
 
     function navigateToModule2() {
+      console.log('navigateToModule2() function called');
       // Check if we're in a Streamlit iframe
       if (window.parent !== window) {
+        console.log('Detected iframe environment');
         // We're in an iframe, try to communicate with parent
         try {
           window.parent.postMessage({
@@ -982,11 +984,14 @@
             module: '💡 Module 2: Types of Prompts'
           }, '*');
           console.log('Sent navigation request to Module 2');
+          // Visual feedback for user
+          alert('Navigation request sent to Module 2');
         } catch (error) {
-          console.log('Parent communication failed, falling back to direct navigation');
+          console.log('Parent communication failed, falling back to direct navigation', error);
           window.top.location.href = 'module2.html';
         }
       } else {
+        console.log('Detected standalone environment, direct navigation');
         // Direct navigation for standalone HTML
         window.location.href = 'module2.html';
       }
