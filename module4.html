@@ -755,33 +755,6 @@
       color: white;
     }
 
-    .navigation {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 4rem 0 2rem 0;
-      padding: 2rem 0;
-      border-top: 1px solid var(--border, #e0e0e0);
-    }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--accent, #4a47a3);
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .nav-link:hover {
-      transform: translateX(-5px);
-    }
-
-    .nav-link.next:hover {
-      transform: translateX(5px);
-    }
-
     /* Animation for fade-in effect */
     .fade-in {
       opacity: 0;
@@ -1054,14 +1027,6 @@
     .dark-mode .btn.secondary:hover {
       background: var(--accent-dark, #6366f1);
       color: var(--text-light, #ffffff);
-    }
-
-    .dark-mode .navigation {
-      border-top-color: var(--border-dark, #333);
-    }
-
-    .dark-mode .nav-link {
-      color: var(--accent-dark, #6366f1);
     }
   </style>
 </head>
@@ -1472,17 +1437,6 @@
       
       <div id="completion-status"></div>
     </section>
-
-    <!-- Navigation -->
-    <div class="navigation">
-      <a href="module3.html" class="nav-link">← Previous: Building Better Prompts</a>
-      <a href="module5.html" class="nav-link next">Next: Context & Specificity →</a>
-    </div>
-
-    <!-- Home Link -->
-    <div style="text-align: center; margin: 2rem 0;">
-      <a href="index.html" class="btn secondary">🏠 Back to Home</a>
-    </div>
   </main>
 
   <script>
