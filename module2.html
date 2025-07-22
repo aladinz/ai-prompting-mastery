@@ -1110,98 +1110,6 @@
       50% { opacity: 1; transform: translateX(-50%) translateY(0); }
     }
 
-    /* Navigation buttons */
-    .cta-button {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 1rem 2rem;
-      border: none;
-      border-radius: 25px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-      text-align: center;
-      min-width: 200px;
-    }
-
-    .cta-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-      text-decoration: none;
-      color: white;
-    }
-
-    .cta-button:visited {
-      color: white;
-    }
-
-    .module-nav-btn {
-      background: linear-gradient(135deg, #4a47a3 0%, #667eea 100%);
-      color: white;
-      padding: 0.8rem 1.5rem;
-      border: none;
-      border-radius: 20px;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-      transition: all 0.3s ease;
-      box-shadow: 0 3px 10px rgba(74, 71, 163, 0.3);
-      margin: 0.5rem;
-    }
-
-    .module-nav-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 15px rgba(74, 71, 163, 0.4);
-      text-decoration: none;
-      color: white;
-    }
-
-    .module-nav-btn:visited {
-      color: white;
-    }
-
-    .module-footer {
-      text-align: center;
-      padding: 2rem;
-      margin-top: 3rem;
-      border-top: 1px solid #e0e0e0;
-    }
-
-    .next-module {
-      text-align: center;
-      padding: 2rem;
-      margin-top: 2rem;
-    }
-
-    /* Dark mode styles for navigation */
-    .dark-mode .module-footer {
-      border-top: 1px solid #444;
-    }
-
-    .dark-mode .cta-button {
-      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-      box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
-    }
-
-    .dark-mode .cta-button:hover {
-      box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
-    }
-
-    .dark-mode .module-nav-btn {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
-    }
-
-    .dark-mode .module-nav-btn:hover {
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    }
-
     /* Responsive design */
     @media (max-width: 768px) {
       .toc-grid {
@@ -1702,17 +1610,7 @@
       </div>
       <p id="status"></p>
     </section>
-
-    <section class="next-module">
-      <button onclick="navigateToModule3()" class="cta-button">➡️ Go to Module 3</button>
-    </section>
   </main>
-
-  <footer class="module-footer">
-    <button onclick="navigateToModule1()" class="module-nav-btn">← Previous Module</button>
-    <button onclick="navigateToHome()" class="module-nav-btn">🏠 Home</button>
-    <button onclick="navigateToModule3()" class="module-nav-btn">Next Module ➡️</button>
-  </footer>
 
   <script>
     // Enhanced functionality for Module 2
@@ -1988,67 +1886,6 @@
     
     // Handle scroll events for animations
     window.addEventListener('scroll', handleScrollAnimations);
-
-    // Navigation functions for Streamlit compatibility
-    function navigateToHome() {
-      // Check if we're in a Streamlit iframe
-      if (window.parent !== window) {
-        // We're in an iframe, try to communicate with parent
-        try {
-          window.parent.postMessage({
-            type: 'streamlit_navigation',
-            module: '🏠 Home'
-          }, '*');
-          console.log('Sent navigation request to Home');
-        } catch (error) {
-          console.log('Parent communication failed, falling back to direct navigation');
-          window.top.location.href = 'index.html';
-        }
-      } else {
-        // Direct navigation for standalone HTML
-        window.location.href = 'index.html';
-      }
-    }
-
-    function navigateToModule1() {
-      // Check if we're in a Streamlit iframe
-      if (window.parent !== window) {
-        // We're in an iframe, try to communicate with parent
-        try {
-          window.parent.postMessage({
-            type: 'streamlit_navigation',
-            module: '📖 Module 1: Getting Started'
-          }, '*');
-          console.log('Sent navigation request to Module 1');
-        } catch (error) {
-          console.log('Parent communication failed, falling back to direct navigation');
-          window.top.location.href = 'module1.html';
-        }
-      } else {
-        // Direct navigation for standalone HTML
-        window.location.href = 'module1.html';
-      }
-    }
-
-    function navigateToModule3() {
-      // Check if we're in a Streamlit iframe
-      if (window.parent !== window) {
-        // We're in an iframe, try to communicate with parent
-        try {
-          window.parent.postMessage({
-            type: 'streamlit_navigation',
-            module: '🏗️ Module 3: Building Better Prompts'
-          }, '*');
-          console.log('Sent navigation request to Module 3');
-        } catch (error) {
-          console.log('Parent communication failed, falling back to direct navigation');
-          window.top.location.href = 'module3.html';
-        }
-      } else {
-        // Direct navigation for standalone HTML
-        window.location.href = 'module3.html';
-      }
-    }
   </script>
 </body>
 </html>
