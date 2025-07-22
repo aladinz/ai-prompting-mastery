@@ -357,50 +357,6 @@
       border-top-color: var(--light-bg-dark, #374151);
     }
 
-    /* Navigation button styling */
-    .nav-button {
-      background: none;
-      border: 2px solid var(--accent, #4a47a3);
-      color: var(--accent, #4a47a3);
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
-      font-family: inherit;
-      position: relative;
-      z-index: 1000;
-      pointer-events: auto;
-    }
-
-    .nav-button:hover {
-      background: var(--accent, #4a47a3);
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(74, 71, 163, 0.3);
-    }
-
-    .nav-button:active {
-      transform: translateY(0);
-    }
-
-    /* Dark mode navigation buttons */
-    .dark-mode .nav-button,
-    html.dark-mode .nav-button {
-      border-color: var(--accent-dark, #6366f1);
-      color: var(--accent-dark, #6366f1);
-    }
-
-    .dark-mode .nav-button:hover,
-    html.dark-mode .nav-button:hover {
-      background: var(--accent-dark, #6366f1);
-      color: white;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-    }
-
     @media print {
       .cheat-sheet, .module-footer, .progress-bar, .complete, .module-progress, .table-of-contents {
         display: none !important;
@@ -712,13 +668,6 @@
     </section>
   </main>
 
-  <footer class="module-footer">
-    <div class="footer-navigation">
-      <button onclick="navigateToHome()" class="nav-button nav-back">← Back to Home</button>
-      <button onclick="navigateToModule2()" class="nav-button nav-next">Next Module ➡️</button>
-    </div>
-  </footer>
-
   <script>
     // Copy to clipboard functionality
     function copyToClipboard(element) {
@@ -952,50 +901,6 @@
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    }
-
-    // Navigation functions for Streamlit compatibility    
-    function navigateToHome() {
-      // Check if we're in a Streamlit iframe
-      if (window.parent !== window) {
-        // We're in an iframe, use query parameter navigation for more reliable results
-        try {
-          // Navigate using query parameters which trigger Streamlit rerun
-          window.top.location.href = window.top.location.origin + window.top.location.pathname + '?nav_to=' + encodeURIComponent('🏠 Home');
-          console.log('Navigating via query parameter to Home');
-        } catch (error) {
-          console.log('Query parameter navigation failed, falling back to direct navigation', error);
-          window.top.location.href = 'index.html';
-        }
-      } else {
-        // Direct navigation for standalone HTML
-        window.location.href = 'index.html';
-      }
-    }
-
-    function navigateToModule2() {
-      console.log('navigateToModule2() function called');
-      
-      // Check if we're in a Streamlit iframe
-      if (window.parent !== window) {
-        console.log('Detected iframe environment');
-        
-        // We're in an iframe, use query parameter navigation for more reliable results
-        try {
-          // Navigate using query parameters which trigger Streamlit rerun
-          const targetURL = window.top.location.origin + window.top.location.pathname + '?nav_to=' + encodeURIComponent('💡 Module 2: Types of Prompts');
-          console.log('Target URL:', targetURL);
-          window.top.location.href = targetURL;
-          console.log('Navigating via query parameter to Module 2');
-        } catch (error) {
-          console.log('Query parameter navigation failed, falling back to direct navigation', error);
-          window.top.location.href = 'module2.html';
-        }
-      } else {
-        console.log('Detected standalone environment, direct navigation');
-        // Direct navigation for standalone HTML
-        window.location.href = 'module2.html';
-      }
     }
   </script>
 </body>
