@@ -148,4 +148,4 @@ streamlit run streamlit_app.py
 - **Vercel/Netlify:** Deploy the HTML version as static site
 
 ## ✨ Credits
-Made with ❤️ by Aladdin. For questions or feedback, open an issue or contact via GitHub.
+Built with ❤️ by Aladdin for learners who want to master AI prompting. For questions or feedback, open an issue or contact via GitHub.

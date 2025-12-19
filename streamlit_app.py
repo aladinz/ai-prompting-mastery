@@ -699,7 +699,7 @@ def main():
     st.markdown(f"""
     <div style="text-align: center; padding: 2rem; {footer_style}">
         <p>🤖 <strong>AI Prompting Mastery</strong> - Your Complete Guide to Effective AI Communication</p>
-        <p>Built with ❤️ for learners who want to master AI prompting</p>
+        <p>Built with ❤️ by Aladdin for learners who want to master AI prompting</p>
         <p>💡 <em>Tip: Use the theme toggle in the sidebar to switch between light and dark modes!</em></p>
     </div>
     """, unsafe_allow_html=True)
